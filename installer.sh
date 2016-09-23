@@ -17,6 +17,7 @@ main() {
   welcome
   check_plataform
   update_plataform
+  check_gcc
   menu
   # check_webserver
   # check_git_installation
@@ -38,7 +39,7 @@ welcome() {
   printf '%s\n' '|  |/    \ /  ___/\   __\__  \ |  | |  | _/ __ \_  __ \    /  ___/  |  \ '
   printf '%s\n' '|  |   |  \\___ \  |  |  / __ \|  |_|  |_\  ___/|  | \/    \___ \|   Y  \'
   printf '%s\n' '|__|___|  /____  > |__| (____  /____/____/\___  >__|    /\/____  >___|  /'
-  printf '%s\n' '        \/     \/            \/               \/        \/     \/     \/ ' 
+  printf '%s\n' '        \/     \/            \/               \/        \/     \/     \/ '
   printf '%s\n' 'Please look over the ~/.installerrc file to select plugins and options.'
   printf '%s\n'
   printf '%s\n' 'p.s. Follow us at https://twitter.com/rbarros.'
@@ -102,6 +103,11 @@ check_distro() {
       #debug "detected CentOS ${OS_VERSION}"
       PACKAGE="yum"
       ;;
+    redhat*)
+      step_done
+      #debug "detected RHEL ${OS_VERSION}"
+      PACKAGE="yum"
+      ;;
     fedora*)
       step_done
       #debug "detected Fedora ${OS_VERSION}"
@@ -143,19 +149,43 @@ update_distro() {
   super -v+ ${PACKAGE} -y update
 }
 
+check_gcc() {
+  step "Verifying that gcc is installed"
+  step_done
+  if command_exists gcc; then
+    debug "gcc is installed, skipping gcc installation."
+    debug $(gcc --version)
+  else
+    install_gcc
+  fi
+}
+
+install_gcc() {
+  debug "Installing gcc"
+  super -v+ ${PACKAGE} -y install gcc
+}
+
 menu() {
+  step "Select option install"
   p="ok"
   while true $p != "ok"
   do
+     step_done
      debug "Menu"
      debug ""
-     debug "1 - Instalar LAMP"
+     debug "1 - Install LAMP"
+     debug "2 - Oracle Instant"
+     debug "3 - Install Oci8"
+     debug "4 - Install PDO Oci8"
      debug "5 - Sair"
      debug ""
-     debug "Digite a opcao desejada:"
+     debug "Enter the desired option:"
      read p
      case $p in
      5) break;;
+     4) install_pdo_oci8 ;;
+     3) install_oci8 ;;
+     2) oracle_instant ;;
      1) install_lamp ;;
      esac
   done
@@ -167,16 +197,33 @@ download() {
 }
 
 install_lamp() {
+  step "Install LAMP"
+  step_done
   check_webserver
+  check_php
+  check_mysql
+}
+
+check_webserver() {
+  step "Verifying that webserver is installed"
+  step_done
+
+  if command_exists apache2; then
+    SERVER="apache2"
+    HTTPD_ROOT="/var/www/html"
+  elif command_exists nginx; then
+    SERVER="nginx"
+    HTTPD_ROOT="/usr/share/nginx/html"
+  fi
   if [ -d "$HTTPD_ROOT" ]; then
-    echo "ok [$HTTPD_ROOT]"
-    httpd_install
+    debug $($SERVER -v)
+    debug "ok [$HTTPD_ROOT]"
   else
-    httpd_install
+    install_httpd
   fi
 }
 
-httpd_install() {
+install_httpd() {
   step "Install webserver"
   case ${OS} in
     ubuntu*)
@@ -207,18 +254,227 @@ httpd_install() {
   esac
 }
 
-check_webserver() {
-  step "Checking webserver installation"
+check_php() {
+  step "Verifying that php is installed"
   step_done
-
-  if command_exists apache2; then
-    SERVER="apache2"
-    HTTPD_ROOT="/var/www/html"
-  elif command_exists nginx; then
-    SERVER="nginx"
-    HTTPD_ROOT="/usr/share/nginx/html"
+  if command_exists php; then
+    recommended_version=7.0.0
+    current_version=$(php -v)
+    if version_gt $recommended_version $current_version; then
+      #echo "$recommended_version is greater than $current_version !"
+      warn "current php version is smaller recomended!"
+    else
+      #echo "$recommended_version is smaller than $current_version !"
+      debug "ok php version - $current_version"
+    fi
+  else
+    install_php
   fi
 }
+
+install_php() {
+  step "Install php"
+  case ${OS} in
+    ubuntu*)
+      step_done
+      super -v+ $PACKAGE install php7.0 php7.0-dev php7.0-mcrypt php7.0-common php7.0-curl php7.0-cli php7.0-gd php7.0-json php7.0-xml libapache2-mod-php7.0 php7.0-zip php-pear build-essential build-dep
+      super -v+ a2enmod rewrite
+      ;;
+    debian*)
+      step_done
+      super -v+ $PACKAGE install php7.0 php7.0-dev php7.0-mcrypt php7.0-common php7.0-curl php7.0-cli php7.0-gd php7.0-json php7.0-xml libapache2-mod-php7.0 php7.0-zip php-pear build-essential build-dep
+      super -v+ a2enmod rewrite
+      ;;
+    centos*)
+      step_done
+      super -v+ $PACKAGE install php70u mod_php70u php70u-common php70u-cli php70u-mysqlnd php70u-mcrypt php70u-pear php70u-devel php70u-json php70u-mbstring
+      super bash -c 'echo -e "<IfModule mod_rewrite.c>\n\tLoadModule rewrite_module modules/mod_rewrite.so\n</IfModule>" >> /etc/httpd/conf.modules.d/10-php.conf'
+      super systemctl restart httpd.service
+      ;;
+    redhat*)
+      super -v+ $PACKAGE install php70u mod_php70u php70u-common php70u-cli php70u-mysqlnd php70u-mcrypt php70u-pear php70u-devel php70u-json php70u-mbstring
+      super bash -c 'echo -e "<IfModule mod_rewrite.c>\n\tLoadModule rewrite_module modules/mod_rewrite.so\n</IfModule>" >> /etc/httpd/conf.modules.d/10-php.conf'
+      super systemctl restart httpd.service
+      ;;
+    fedora*)
+      step_done
+      super -v+ $PACKAGE install php70u mod_php70u php70u-common php70u-cli php70u-mysqlnd php70u-mcrypt php70u-pear php70u-devel php70u-json php70u-mbstring
+      super bash -c 'echo -e "<IfModule mod_rewrite.c>\n\tLoadModule rewrite_module modules/mod_rewrite.so\n</IfModule>" >> /etc/httpd/conf.modules.d/10-php.conf'
+      super systemctl restart httpd.service
+      ;;
+    *)
+      step_fail
+      add_report "Cannot detect the current distro."
+      fail
+      ;;
+  esac
+}
+
+check_mysql() {
+  step "Verifying that mysql is installed"
+  step_done
+
+  if command_exists $(mysql --version); then
+    debug $(mysql --version)
+  else
+    install_mysql
+    mysql_secure_installation
+  fi
+}
+
+install_mysql() {
+  step "Install mysql"
+  case ${OS} in
+    ubuntu*)
+      step_done
+      super -v+ $PACKAGE install mariadb-server mariadb-client
+      ;;
+    debian*)
+      step_done
+      super -v+ $PACKAGE install mariadb-server mariadb-client
+      ;;
+    centos*)
+      step_done
+      super -v+ $PACKAGE install mariadb-server mariadb
+      super -v+ systemctl start mariadb
+      super -v+ systemctl enable mariadb.service
+      ;;
+    redhat*)
+      super -v+ $PACKAGE install mariadb-server mariadb
+      super -v+ systemctl start mariadb
+      super -v+ systemctl enable mariadb.service
+      ;;
+    fedora*)
+      step_done
+      super -v+ $PACKAGE install mariadb-server mariadb-client
+      super -v+ systemctl start mariadb
+      super -v+ systemctl enable mariadb.service
+      ;;
+    *)
+      step_fail
+      add_report "Cannot detect the current distro."
+      fail
+      ;;
+  esac
+}
+
+oracle_instant() {
+  step "Install oracle instant"
+  case ${OS} in
+    ubuntu*)
+      step_done
+      super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
+      super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
+      super -v+ dpkg -i oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
+      super -v+ dpkg -i oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
+      super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
+
+      # SQLSTATE[HY000]: pdo_oci_handle_factory; ORA-12546: TNS: permission denied (/home/user/php-7.0.6/ext/pdo_oci/)
+      super setsebool -P httpd_can_network_connect on
+      ;;
+    debian*)
+      step_done
+      super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
+      super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
+      super -v+ dpkg -i oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
+      super -v+ dpkg -i oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
+      super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
+
+      # SQLSTATE[HY000]: pdo_oci_handle_factory; ORA-12546: TNS: permission denied (/home/user/php-7.0.6/ext/pdo_oci/)
+      super setsebool -P httpd_can_network_connect on
+      ;;
+    centos*)
+      step_done
+      super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+      super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+      super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+      super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+      super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
+
+      # SQLSTATE[HY000]: pdo_oci_handle_factory; ORA-12546: TNS: permission denied (/home/user/php-7.0.6/ext/pdo_oci/)
+      super setsebool -P httpd_can_network_connect on
+      ;;
+    redhat*)
+      super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+      super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+      super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+      super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+      super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
+
+      # SQLSTATE[HY000]: pdo_oci_handle_factory; ORA-12546: TNS: permission denied (/home/user/php-7.0.6/ext/pdo_oci/)
+      super setsebool -P httpd_can_network_connect on
+      ;;
+    fedora*)
+      step_done
+      super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+      super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+      super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+      super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+      super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
+
+      # SQLSTATE[HY000]: pdo_oci_handle_factory; ORA-12546: TNS: permission denied (/home/user/php-7.0.6/ext/pdo_oci/)
+      super setsebool -P httpd_can_network_connect on
+      ;;
+    *)
+      step_fail
+      add_report "Cannot detect the current distro."
+      fail
+      ;;
+  esac
+}
+
+install_oci8() {
+  step "Install oci8"
+  step_done
+
+  if command_exists pecl; then
+    debug "pecl is installed, skipping pecl installation."
+  else
+    install_pear
+  fi
+}
+
+install_pear() {
+  step "Install php"
+  case ${OS} in
+    ubuntu*)
+      step_done
+      super -v+ $PACKAGE install php-pear build-essential build-dep
+      super -v+ a2enmod rewrite
+      ;;
+    debian*)
+      step_done
+      super -v+ $PACKAGE install php-pear build-essential build-dep
+      super -v+ a2enmod rewrite
+      ;;
+    centos*)
+      step_done
+      super -v+ $PACKAGE install php70u-pear
+      super systemctl restart httpd.service
+      ;;
+    redhat*)
+      super -v+ $PACKAGE install php70u-pear
+      super systemctl restart httpd.service
+      ;;
+    fedora*)
+      step_done
+      super -v+ $PACKAGE install php70u-pear
+      super systemctl restart httpd.service
+      ;;
+    *)
+      step_fail
+      add_report "Cannot detect the current distro."
+      fail
+      ;;
+  esac
+}
+
+# php version 7.0 (recomended)
+check_php_version() {
+    return verlte php -v 7.0 && echo "yes" || echo "no"
+}
+
+version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
 
 verlte() {
     [  "$1" = "`echo -e "$1\n$2" | sort -n | head -n1`" ]
@@ -229,7 +485,7 @@ verlt() {
 }
 
 # git version 1.8.5.2 (Apple Git-48)
-check() {
+check_git_version() {
     return verlte git --version 1.0 && echo "yes" || echo "no"
 }
 
@@ -245,7 +501,7 @@ check_git_installation() {
 check_git() {
   step "Checking version git"
   step_done
-  if [ check = "yes" ]; then
+  if [ check_git_version = "yes" ]; then
     warn "version below 1.0"
     install_git
   else
@@ -395,7 +651,7 @@ alter_env() {
     #if [ -z "$DB_PASSWORD:[secret]" ]; then
       #DB_PASSWORD=secret
     #fi
-    
+
     step "Create database project"
     if echo "create database $DB_DATABASE charset utf8;" | mysql -u $DB_USERNAME -p$DB_PASSWORD; then    # allowed to fail
         step_done
@@ -405,7 +661,7 @@ alter_env() {
         add_report "Database $DB_DATABASE not created"
         fail
     fi
-    
+
     if [ ! -f ".env.bkp" ]; then
         debug "Backup .env"
         cp .env .env.bkp
@@ -477,7 +733,7 @@ comfirm() {
     text="$1 [y/N]"
     read -r -p "$text " response
     case $response in
-        [yY][eE][sS]|[yY]) 
+        [yY][eE][sS]|[yY])
             true
             ;;
         *)
