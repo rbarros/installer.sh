@@ -731,7 +731,7 @@ create_project() {
       debug "The project repository is required."
       create_project
     fi
-    super git clone $repo $PROJECT
+    super -v+ git clone $repo $PROJECT
     step "Permission path project"
     case ${OS} in
       ubuntu*)
@@ -761,7 +761,7 @@ create_project() {
         ;;
     esac
     cd $PROJECT
-    composer install
+    super -v+ composer install
   else
     debug "The project [$PROJECT] already exists!"
     UPDATE="true"
