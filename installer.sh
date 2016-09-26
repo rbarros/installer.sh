@@ -706,6 +706,7 @@ install_composer() {
   fi
   if comfirm "Move composer /usr/bin/composer ?"; then
       super mv composer.phar /usr/bin/composer
+      super chmod +x /usr/bin/composer
   fi
 }
 
