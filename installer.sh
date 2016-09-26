@@ -161,7 +161,7 @@ install_gcc() {
   super -v+ ${PACKAGE} -y install gcc
 }
 
-check_gcc() {
+check_grep() {
   step "Verifying that grep is installed"
   step_done
   if command_exists grep; then
