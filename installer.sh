@@ -183,12 +183,14 @@ menu() {
      debug "5 - Install git"
      debug "6 - Install composer"
      debug "7 - Create Project"
+     debug "8 - Permissions"
      debug "9 - Sair"
      debug ""
      debug "Enter the desired option:"
      read p
      case $p in
      9) break;;
+     8) path_permissions ;;
      7) create_project ;;
      6) check_composer_installation ;;
      5) check_git_installation ;;
