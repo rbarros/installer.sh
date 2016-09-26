@@ -324,7 +324,7 @@ install_php() {
       step_done
       debug "Install php debian"
       #super -v+ $PACKAGE install php7.0 php7.0-dev php7.0-mcrypt php7.0-common php7.0-curl php7.0-cli php7.0-gd php7.0-json php7.0-xml libapache2-mod-php7.0 php7.0-zip php-pear build-essential build-dep
-      super -v+ $PACKAGE install php php-dev php-mcrypt php-common php-curl php-cli php-gd php-json php-xml libapache2-mod-php php-zip php-pear build-essential build-dep
+      super -v+ $PACKAGE install php5 php5-dev php5-mcrypt php5-common php5-curl php5-cli php5-gd php5-json php5-xml libapache2-mod-php5 libphp-pclzip php-pear build-essential build-dep
       super -v+ a2enmod rewrite
       ;;
     centos*)
