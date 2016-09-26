@@ -230,6 +230,7 @@ install_lamp() {
   check_webserver
   check_php
   check_mysql
+  debug "Finish install LAMP"
 }
 
 check_webserver() {
@@ -535,6 +536,8 @@ install_oci8() {
   else
     install_pear
   fi
+  pecl install oci8
+  super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php.d/20-oci8.ini'
 }
 
 install_pear() {
@@ -543,12 +546,12 @@ install_pear() {
     ubuntu*)
       step_done
       super -v+ $PACKAGE install php-pear build-essential build-dep
-      super -v+ a2enmod rewrite
+      super service apache2 restart
       ;;
     debian*)
       step_done
-      super -v+ $PACKAGE install php-pear build-essential build-dep
-      super -v+ a2enmod rewrite
+      super -v+ $PACKAGE install php-pear build-essential
+      super service apache2 restart
       ;;
     centos*)
       step_done
@@ -588,9 +591,9 @@ install_pdo_oci8() {
   ./configure --with-pdo-oci=instantclient,/usr,11.2
   make
   make install
-  bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php.d/20-pdo_oci.ini'
+  super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php.d/20-pdo_oci.ini'
   php -i | grep oci
-  bash -c 'echo -e "<?php phpinfo(); " > $HTTPD_ROOT/phpinfo.php'
+  super bash -c 'echo -e "<?php phpinfo(); " > $HTTPD_ROOT/phpinfo.php'
   ip addr show | grep "inet 192" | awk -F/ '{print $1}' | sed -e "s/inet//g"
 }
 
