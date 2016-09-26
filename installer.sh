@@ -713,6 +713,7 @@ create_project() {
   step "Create a project installer"
   step_done
   htdocs=""
+  repo=""
   read -p "What the directory apache/nginx [$HTTPD_ROOT] ? " htdocs
   if [ "$htdocs" ]; then
     HTTPD_ROOT=$htdocs
@@ -724,7 +725,43 @@ create_project() {
   fi
   if [ ! -d "$PROJECT" ]; then
     cd $HTTPD_ROOT
-    super mkdir "$HTTPD_ROOT/$PROJECT"
+    #super mkdir "$HTTPD_ROOT/$PROJECT"
+    read -p "What the project repository ? " repo
+    if [ -z "$repo" ]; then
+      debug "The project repository is required."
+      create_project
+    fi
+    super git clone $repo $PROJECT
+    step "Permission path project"
+    case ${OS} in
+      ubuntu*)
+        step_done
+        super chown www-data:root $PROJECT -hR
+        ;;
+      debian*)
+        step_done
+        super chown www-data:root $PROJECT -hR
+        ;;
+      centos*)
+        step_done
+        super chown apache:root $PROJECT -hR
+        ;;
+      redhat*)
+        step_done
+        super chown apache:root $PROJECT -hR
+        ;;
+      fedora*)
+        step_done
+        super chown apache:root $PROJECT -hR
+        ;;
+      *)
+        step_fail
+        add_report "Cannot detect the current distro."
+        fail
+        ;;
+    esac
+    cd $PROJECT
+    composer install
   else
     debug "The project [$PROJECT] already exists!"
     UPDATE="true"
