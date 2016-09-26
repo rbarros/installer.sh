@@ -415,7 +415,7 @@ check_mysql() {
   step "Verifying that mysql is installed"
   step_done
 
-  if command_exists $(mysql --version); then
+  if command_exists mysql; then
     debug $(mysql --version)
   else
     install_mysql
