@@ -256,20 +256,31 @@ install_httpd() {
   case ${OS} in
     ubuntu*)
       step_done
+      debug "Install webserver ubuntu"
       super -v+ $PACKAGE install apache2
       ;;
     debian*)
       step_done
+      debug "Install webserver debian"
       super -v+ $PACKAGE install apache2
       ;;
     centos*)
       step_done
+      debug "Install webserver centos"
+      super -v+ $PACKAGE install httpd
+      super -v+ systemctl start httpd.service
+      super -v+ systemctl enable httpd.service
+      ;;
+    redhat*)
+      step_done
+      debug "Install webserver redhat"
       super -v+ $PACKAGE install httpd
       super -v+ systemctl start httpd.service
       super -v+ systemctl enable httpd.service
       ;;
     fedora*)
       step_done
+      debug "Install webserver fedora"
       super -v+ $PACKAGE install httpd
       super -v+ systemctl start httpd.service
       super -v+ systemctl enable httpd.service
@@ -305,27 +316,37 @@ install_php() {
   case ${OS} in
     ubuntu*)
       step_done
+      debug "Install php ubuntu"
       super -v+ $PACKAGE install php7.0 php7.0-dev php7.0-mcrypt php7.0-common php7.0-curl php7.0-cli php7.0-gd php7.0-json php7.0-xml libapache2-mod-php7.0 php7.0-zip php-pear build-essential build-dep
       super -v+ a2enmod rewrite
       ;;
     debian*)
       step_done
+      debug "Install php debian"
       #super -v+ $PACKAGE install php7.0 php7.0-dev php7.0-mcrypt php7.0-common php7.0-curl php7.0-cli php7.0-gd php7.0-json php7.0-xml libapache2-mod-php7.0 php7.0-zip php-pear build-essential build-dep
       super -v+ $PACKAGE install php php-dev php-mcrypt php-common php-curl php-cli php-gd php-json php-xml libapache2-mod-php php-zip php-pear build-essential build-dep
       super -v+ a2enmod rewrite
       ;;
     centos*)
       step_done
+      centos_install_epel
+      centos_install_ius
+      debug "Install php centos"
       super -v+ $PACKAGE install php70u mod_php70u php70u-common php70u-cli php70u-mysqlnd php70u-mcrypt php70u-pear php70u-devel php70u-json php70u-mbstring
       super bash -c 'echo -e "<IfModule mod_rewrite.c>\n\tLoadModule rewrite_module modules/mod_rewrite.so\n</IfModule>" >> /etc/httpd/conf.modules.d/10-php.conf'
       super systemctl restart httpd.service
       ;;
     redhat*)
+      step_done
+      rhel_install_epel
+      rhel_install_ius
+      debug "Install php readhat"
       super -v+ $PACKAGE install php70u mod_php70u php70u-common php70u-cli php70u-mysqlnd php70u-mcrypt php70u-pear php70u-devel php70u-json php70u-mbstring
       super bash -c 'echo -e "<IfModule mod_rewrite.c>\n\tLoadModule rewrite_module modules/mod_rewrite.so\n</IfModule>" >> /etc/httpd/conf.modules.d/10-php.conf'
       super systemctl restart httpd.service
       ;;
     fedora*)
+      debug "Install php fedora"
       step_done
       super -v+ $PACKAGE install php70u mod_php70u php70u-common php70u-cli php70u-mysqlnd php70u-mcrypt php70u-pear php70u-devel php70u-json php70u-mbstring
       super bash -c 'echo -e "<IfModule mod_rewrite.c>\n\tLoadModule rewrite_module modules/mod_rewrite.so\n</IfModule>" >> /etc/httpd/conf.modules.d/10-php.conf'
@@ -337,6 +358,57 @@ install_php() {
       fail
       ;;
   esac
+}
+
+centos_install_epel(){
+  # CentOS has epel release in the extras repo
+  super -v+ $PACKAGE -y install epel-release
+  import_epel_key
+}
+
+rhel_install_epel(){
+  case ${RELEASE} in
+    5*) el5_download_install https://dl.fedoraproject.org/pub/epel/epel-release-latest-5.noarch.rpm;;
+    6*) super -v+ $PACKAGE -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm;;
+    7*) super -v+ $PACKAGE -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm;;
+  esac
+  import_epel_key
+}
+
+import_epel_key(){
+  case ${RELEASE} in
+    5*) rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL;;
+    6*) rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6;;
+    7*) rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7;;
+  esac
+}
+
+centos_install_ius(){
+  case ${RELEASE} in
+    5*) el5_download_install https://centos5.iuscommunity.org/ius-release.rpm;;
+    6*) super -v+ $PACKAGE -y install https://centos6.iuscommunity.org/ius-release.rpm;;
+    7*) super -v+ $PACKAGE -y install https://centos7.iuscommunity.org/ius-release.rpm;;
+  esac
+  import_ius_key
+}
+
+rhel_install_ius(){
+  case ${RELEASE} in
+    5*) el5_download_install https://rhel5.iuscommunity.org/ius-release.rpm;;
+    6*) super -v+ $PACKAGE -y install https://rhel6.iuscommunity.org/ius-release.rpm;;
+    7*) super -v+ $PACKAGE -y install https://rhel7.iuscommunity.org/ius-release.rpm;;
+  esac
+  import_ius_key
+}
+
+el5_download_install(){
+  wget -O /tmp/release.rpm ${1}
+  super -v+ $PACKAGE -y localinstall /tmp/release.rpm
+  rm -f /tmp/release.rpm
+}
+
+import_ius_key(){
+  rpm --import /etc/pki/rpm-gpg/IUS-COMMUNITY-GPG-KEY
 }
 
 check_mysql() {
@@ -369,6 +441,7 @@ install_mysql() {
       super -v+ systemctl enable mariadb.service
       ;;
     redhat*)
+      step_done
       super -v+ $PACKAGE install mariadb-server mariadb
       super -v+ systemctl start mariadb
       super -v+ systemctl enable mariadb.service
@@ -424,6 +497,7 @@ oracle_instant() {
       super setsebool -P httpd_can_network_connect on
       ;;
     redhat*)
+      step_done
       super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
       super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
       super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
@@ -482,6 +556,7 @@ install_pear() {
       super systemctl restart httpd.service
       ;;
     redhat*)
+      step_done
       super -v+ $PACKAGE install php70u-pear
       super systemctl restart httpd.service
       ;;
