@@ -530,13 +530,24 @@ oracle_instant() {
 install_oci8() {
   step "Install oci8"
   step_done
-
+  debug "Use 'pecl install oci8' to install for PHP 7."
+  debug "Use 'pecl install oci8-2.0.12' to install for PHP 5.2 - PHP 5.6."
+  debug "Use 'pecl install oci8-1.4.10' to install for PHP 4.3.9 - PHP 5.1."
   if command_exists pecl; then
     debug "pecl is installed, skipping pecl installation."
   else
     install_pear
   fi
-  pecl install oci8
+  recommended_version=7.0.0
+  current_version=$(php -v)
+  if version_gt "7.0.0" $current_version; then
+    warn "current php version is smaller recomended!"
+    debug "Use 'pecl install oci8-2.0.12' to install for PHP 5.2 - PHP 5.6"
+    super pecl install oci8-2.0.12
+  else
+    debug "Use 'pecl install oci8' to install for PHP 7"
+    super pecl install oci8
+  fi
   super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php.d/20-oci8.ini'
 }
 
