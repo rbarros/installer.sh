@@ -726,10 +726,10 @@ path_permissions() {
     if [ -d "logs" ]; then
       super chmod -R 777 logs
     fi
-    if [ -d "public/arquivos" ]
+    if [ -d "public/arquivos" ]; then
       super chmod -R 777 public/arquivos
     fi
-    if [ -d "storage" ]
+    if [ -d "storage" ]; then
       super chmod -R 777 storage
     fi
   fi
