@@ -724,13 +724,13 @@ path_permissions() {
   if [ -d "$HTTPD_ROOT/$PROJECT" ]; then
     cd "$HTTPD_ROOT/$PROJECT"
     if [ -d "logs" ]; then
-      super chmod -R 777 logs
+      super chmod -R 777 "logs"
     fi
     if [ -d "public/arquivos" ]; then
-      super chmod -R 777 public/arquivos
+      super chmod -R 777 "public/arquivos"
     fi
     if [ -d "storage" ]; then
-      super chmod -R 777 storage
+      super chmod -R 777 "storage"
     fi
   fi
 }
