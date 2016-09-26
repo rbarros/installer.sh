@@ -762,11 +762,12 @@ create_project() {
         ;;
     esac
     cd $PROJECT
-    super -v+ composer install
+    composer install
   else
     debug "The project [$PROJECT] already exists!"
     UPDATE="true"
     cd "$HTTPD_ROOT/$PROJECT"
+    composer update
   fi
 }
 
