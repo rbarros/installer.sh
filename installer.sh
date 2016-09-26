@@ -432,7 +432,7 @@ install_mysql() {
       ;;
     debian*)
       step_done
-      super -v+ $PACKAGE install mariadb-server mariadb-client
+      super -v+ $PACKAGE install mysql-server mysql-client
       ;;
     centos*)
       step_done
