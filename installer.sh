@@ -7,6 +7,8 @@ ROOT_UID=0
 ARRAY_SEPARATOR="#"
 OS=""
 OS_VERSION=""
+PLATFORM=""
+ARCH=""
 PROJECT=""
 PACKAGE=""
 UPDATE="false"
@@ -19,15 +21,6 @@ main() {
   update_plataform
   check_gcc
   menu
-  # check_webserver
-  # check_git_installation
-  # check_git_config
-  # check_composer_installation
-  # create_project
-  # alter_composer
-  # alter_env
-  # path_permissions
-  # config
   success
 }
 
@@ -74,6 +67,8 @@ check_plataform() {
 
   if [ "$PLATFORM" = "linux" ]; then
     check_distro
+  else
+    ""
   fi
 }
 
@@ -168,6 +163,14 @@ install_gcc() {
 menu() {
   step "Select option install"
   p="ok"
+  # check_git_installation
+  # check_git_config
+  # check_composer_installation
+  # create_project
+  # alter_composer
+  # alter_env
+  # path_permissions
+  # config
   while true $p != "ok"
   do
      step_done
@@ -177,12 +180,18 @@ menu() {
      debug "2 - Oracle Instant"
      debug "3 - Install Oci8"
      debug "4 - Install PDO Oci8"
-     debug "5 - Sair"
+     debug "5 - Install git"
+     debug "6 - Install composer"
+     debug "7 - Create Project"
+     debug "9 - Sair"
      debug ""
      debug "Enter the desired option:"
      read p
      case $p in
-     5) break;;
+     9) break;;
+     7) create_project ;;
+     6) check_composer_installation ;;
+     5) check_git_installation ;;
      4) install_pdo_oci8 ;;
      3) install_oci8 ;;
      2) oracle_instant ;;
@@ -469,6 +478,27 @@ install_pear() {
   esac
 }
 
+install_pdo_oci8() {
+  step "Install pdo oci8"
+  step_done
+  PHP_VERSION=$(php -v | cut -d' ' -f 2 | head -n 1 | awk -F - '{ print $1 }')
+  export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
+  cd ~
+  curl -L -O http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror> php-$PHP_VERSION.tar.bz2
+  tar -jxvf php-$PHP_VERSION.tar.bz2
+  cd $PHP_VERSION/
+  cd ext/
+  cd pdo_oci/
+  phpize
+  ./configure --with-pdo-oci=instantclient,/usr,11.2
+  make
+  make install
+  bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php.d/20-pdo_oci.ini'
+  php -i | grep oci
+  bash -c 'echo -e "<?php phpinfo(); " > $HTTPD_ROOT/phpinfo.php'
+  ip addr show | grep "inet 192" | awk -F/ '{print $1}' | sed -e "s/inet//g"
+}
+
 # php version 7.0 (recomended)
 check_php_version() {
     return verlte php -v 7.0 && echo "yes" || echo "no"
@@ -496,6 +526,7 @@ check_git_installation() {
     debug "Git detected"
     check_git
   fi
+  check_git_config
 }
 
 check_git() {
@@ -584,7 +615,7 @@ create_project() {
   fi
   if [ ! -d "$PROJECT" ]; then
     cd $HTTPD_ROOT
-    composer create-project --prefer-dist laravel/laravel $PROJECT
+    super mkdir "$HTTPD_ROOT/$PROJECT"
   else
     debug "The project [$PROJECT] already exists!"
     UPDATE="true"
@@ -688,12 +719,19 @@ install_sed() {
 }
 
 path_permissions() {
-  step "Changing permissions bootstrap/cache and storage"
+  step "Changing permissions project"
   step_done
   if [ -d "$HTTPD_ROOT/$PROJECT" ]; then
     cd "$HTTPD_ROOT/$PROJECT"
-    super chmod -R 777 bootstrap/cache
-    super chmod -R 777 storage
+    if [ -d "logs" ]; then
+      super chmod -R 777 logs
+    fi
+    if [ -d "public/arquivos" ]
+      super chmod -R 777 public/arquivos
+    fi
+    if [ -d "storage" ]
+      super chmod -R 777 storage
+    fi
   fi
 }
 
