@@ -20,6 +20,7 @@ main() {
   check_plataform
   update_plataform
   check_gcc
+  check_grep
   menu
   success
 }
@@ -158,6 +159,22 @@ check_gcc() {
 install_gcc() {
   debug "Installing gcc"
   super -v+ ${PACKAGE} -y install gcc
+}
+
+check_gcc() {
+  step "Verifying that grep is installed"
+  step_done
+  if command_exists grep; then
+    debug "grep is installed, skipping grep installation."
+    debug $(grep --version)
+  else
+    install_grep
+  fi
+}
+
+install_grep() {
+  debug "Installing grep"
+  super -v+ ${PACKAGE} -y install grep
 }
 
 menu() {
