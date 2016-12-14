@@ -593,7 +593,7 @@ install_pdo_oci8() {
   PHP_VERSION=$(php -v | cut -d' ' -f 2 | head -n 1 | awk -F - '{ print $1 }')
   export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
   cd ~
-  curl -L -O http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror> php-$PHP_VERSION.tar.bz2
+  curl -L http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror> php-$PHP_VERSION.tar.bz2
   tar -jxvf php-$PHP_VERSION.tar.bz2
   cd $PHP_VERSION/
   cd ext/
