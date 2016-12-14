@@ -591,18 +591,25 @@ install_pdo_oci8() {
   step "Install pdo oci8"
   step_done
   PHP_VERSION=$(php -v | cut -d' ' -f 2 | head -n 1 | awk -F - '{ print $1 }')
-  export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
+  #export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
+
+  #checking for oci.h... configure: error: I'm too dumb to figure out where the include dir is in your instant client install
+  #sudo ln -nsf /usr/lib/oracle/12.1/client64/ /usr/lib/oracle/12.1/client
+  #sudo ln -nsf /usr/include/oracle/12.1/client64/ /usr/include/oracle/12.1/client
+  #sudo ln -s /usr/lib/oracle/12.1/client64/lib/libnnz12.so /usr/lib64/libnnz12.so
+  #sudo ln -s /usr/lib/oracle/12.1/client64/lib/libnnz12.so /usr/lib/libnnz12.so
+
   cd ~
   curl -L http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror> php-$PHP_VERSION.tar.bz2
   tar -jxvf php-$PHP_VERSION.tar.bz2
-  cd $PHP_VERSION/
-  cd ext/
-  cd pdo_oci/
+  cd php-$PHP_VERSION/ext/pdo_oci/
   phpize
   ./configure --with-pdo-oci=instantclient,/usr,11.2
   make
   make install
   super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php.d/20-pdo_oci.ini'
+  #sudo ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/apache2/conf.d/20-pdo_oci.ini
+  #sudo ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/cli/conf.d/20-pdo_oci.ini
   php -i | grep oci
   super bash -c 'echo -e "<?php phpinfo(); " > $HTTPD_ROOT/phpinfo.php'
   ip addr show | grep "inet 192" | awk -F/ '{print $1}' | sed -e "s/inet//g"
