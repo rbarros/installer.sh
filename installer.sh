@@ -534,6 +534,9 @@ install_oci8() {
   debug "Use 'pecl install oci8' to install for PHP 7."
   debug "Use 'pecl install oci8-2.0.12' to install for PHP 5.2 - PHP 5.6."
   debug "Use 'pecl install oci8-1.4.10' to install for PHP 4.3.9 - PHP 5.1."
+  debug "Use 'instantclient,/path/to/instant/client/lib' if you're compiling with Oracle Instant Client [autodetect] : copy and paste instantclient,/usr/lib/oracle/11.2/client64/lib"
+  debug "http://www.oracle.com/technetwork/articles/technote-php-instant-084410.html"
+  export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
   if command_exists pecl; then
     debug "pecl is installed, skipping pecl installation."
   else
@@ -544,10 +547,10 @@ install_oci8() {
   if version_gt "7.0.0" $current_version; then
     warn "current php version is smaller recomended!"
     debug "Use 'pecl install oci8-2.0.12' to install for PHP 5.2 - PHP 5.6"
-    super pecl install oci8-2.0.12
+    super -v+ pecl install oci8-2.0.12
   else
     debug "Use 'pecl install oci8' to install for PHP 7"
-    super pecl install oci8
+    super -v+ pecl install oci8
   fi
   super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php.d/20-oci8.ini'
 }
@@ -557,27 +560,27 @@ install_pear() {
   case ${OS} in
     ubuntu*)
       step_done
-      super -v+ $PACKAGE install php-pear build-essential #build-dep
+      super -v+ $PACKAGE install php-pear build-essential php7.0-dev #build-dep
       super service apache2 restart
       ;;
     debian*)
       step_done
-      super -v+ $PACKAGE install php-pear build-essential
+      super -v+ $PACKAGE install php-pear build-essential php5-dev
       super service apache2 restart
       ;;
     centos*)
       step_done
-      super -v+ $PACKAGE install php70u-pear
+      super -v+ $PACKAGE install php70u-pear php70u-devel
       super systemctl restart httpd.service
       ;;
     redhat*)
       step_done
-      super -v+ $PACKAGE install php70u-pear
+      super -v+ $PACKAGE install php70u-pear php70u-devel
       super systemctl restart httpd.service
       ;;
     fedora*)
       step_done
-      super -v+ $PACKAGE install php70u-pear
+      super -v+ $PACKAGE install php70u-pear php70u-devel
       super systemctl restart httpd.service
       ;;
     *)
@@ -592,13 +595,16 @@ install_pdo_oci8() {
   step "Install pdo oci8"
   step_done
   PHP_VERSION=$(php -v | cut -d' ' -f 2 | head -n 1 | awk -F - '{ print $1 }')
-  #export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
+  export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
 
   #checking for oci.h... configure: error: I'm too dumb to figure out where the include dir is in your instant client install
   #sudo ln -nsf /usr/lib/oracle/12.1/client64/ /usr/lib/oracle/12.1/client
   #sudo ln -nsf /usr/include/oracle/12.1/client64/ /usr/include/oracle/12.1/client
   #sudo ln -s /usr/lib/oracle/12.1/client64/lib/libnnz12.so /usr/lib64/libnnz12.so
   #sudo ln -s /usr/lib/oracle/12.1/client64/lib/libnnz12.so /usr/lib/libnnz12.so
+  super ln -nsf /usr/lib/oracle/11.2/client64/ /usr/lib/oracle/11.2/client
+  super ln -nsf /usr/include/oracle/11.2/client64/ /usr/include/oracle/11.2/client
+  super ln -s /usr/lib/oracle/11.2/client64/lib/libnnz11.so /usr/lib/libnnz11.so
 
   cd ~
   curl -L http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror> php-$PHP_VERSION.tar.bz2
@@ -607,7 +613,7 @@ install_pdo_oci8() {
   phpize
   ./configure --with-pdo-oci=instantclient,/usr,11.2
   make
-  make install
+  super make install
   super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php.d/20-pdo_oci.ini'
   #sudo ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/apache2/conf.d/20-pdo_oci.ini
   #sudo ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/cli/conf.d/20-pdo_oci.ini
