@@ -613,6 +613,7 @@ install_pdo_oci8() {
   phpize
   ./configure --with-pdo-oci=instantclient,/usr,11.2
   make
+  make test
   super make install
   super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php.d/20-pdo_oci.ini'
   #sudo ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/apache2/conf.d/20-pdo_oci.ini
