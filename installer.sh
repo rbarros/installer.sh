@@ -225,7 +225,7 @@ menu() {
 
 download() {
   # Download plugin
-  echo -e "|   Downloading plugin.sh to /etc/installersh\n|\n|   + $(wget -nv -o /dev/stdout -O /etc/installersh/installer.sh --no-check-certificate https://raw.github.com/rbarros/installer.sh/master/installer.sh)"
+  echo -e "|   Downloading installer.sh to /etc/installersh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer.sh --no-check-certificate https://raw.github.com/rbarros/installer.sh/dev/installer.sh)"
 }
 
 install_lamp() {
