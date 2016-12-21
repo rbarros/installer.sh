@@ -555,7 +555,13 @@ install_oci8() {
     debug "Use 'pecl install oci8' to install for PHP 7"
     super -v+ pecl install oci8
   fi
-  super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php.d/20-oci8.ini'
+  if [ -d "/etc/php/7.0/mods-available/" ]; then
+    super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php/7.0/mods-available/oci8.ini'
+    super ln -s /etc/php/7.0/mods-available/oci8.ini /etc/php/7.0/apache2/conf.d/20-oci8.ini
+    super ln -s /etc/php/7.0/mods-available/oci8.ini /etc/php/7.0/cli/conf.d/20-oci8.ini
+  else
+    super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php.d/20-oci8.ini'
+  fi
 }
 
 install_pear() {
@@ -618,9 +624,13 @@ install_pdo_oci8() {
   make
   make test
   super make install
-  super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php.d/20-pdo_oci.ini'
-  #sudo ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/apache2/conf.d/20-pdo_oci.ini
-  #sudo ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/cli/conf.d/20-pdo_oci.ini
+  if [ -d "/etc/php/7.0/mods-available/" ]; then
+    super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php/7.0/mods-available/pdo_oci.ini'
+    super ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/apache2/conf.d/20-pdo_oci.ini
+    super ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/cli/conf.d/20-pdo_oci.ini
+  else
+    super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php.d/20-pdo_oci.ini'
+  fi
   php -i | grep oci
   super bash -c 'echo -e "<?php phpinfo(); " > $HTTPD_ROOT/phpinfo.php'
   ip addr show | grep "inet 192" | awk -F/ '{print $1}' | sed -e "s/inet//g"
@@ -770,7 +780,7 @@ create_project() {
     step "Permission path project"
     step_done
     debug "# chown <user_apache>:<grupo_user> $PROJECT -hR"
-    super chown $user:$group $PROJECT -hR
+    super chown $user:root $PROJECT -hR
     cd $PROJECT
     super -v+ composer install
   else
@@ -780,7 +790,7 @@ create_project() {
     step "Permission path project"
     step_done
     debug "# chown <user_apache>:<grupo_user> $PROJECT -hR"
-    super chown $user:$group $PROJECT -hR
+    super chown $user:root $PROJECT -hR
     cd $PROJECT
     super -v+ composer update
   fi
@@ -947,14 +957,21 @@ alter_env() {
     #fi
 
     step "Create database project"
-    if echo "create database $DB_DATABASE charset utf8;" | mysql -u $DB_USERNAME -p$DB_PASSWORD; then    # allowed to fail
+    if echo "create database $DB_DATABASE charset utf8;" | mysql -u $DB_USERNAME -p$DB_PASSWORD ; then    # allowed to fail
         step_done
         debug "Database $DB_DATABASE created"
     else
-        #step_fail
-        #add_report "Database $DB_DATABASE not created"
-        #fail
+        step_done
         warn "Database $DB_DATABASE not created"
+    fi
+
+    step "Import database project"
+    if mysql -u $DB_USERNAME -p$DB_PASSWORD $DB_DATABASE < migrations/dump.sql ; then    # allowed to fail
+        step_done
+        debug "Database $DB_DATABASE imported"
+    else
+        step_done
+        warn "Database $DB_DATABASE not imported"
     fi
 
     if [ ! -f ".env.bkp" ]; then
