@@ -6,7 +6,7 @@
 
 if [ -f /tmp/script.sh ]
 then
-    . ./tmp/script.sh --source-only
+    . /tmp/script.sh --source-only
     foo 3
 else
     # Show error
