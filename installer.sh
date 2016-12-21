@@ -202,12 +202,14 @@ menu() {
      debug "6 - Install composer"
      debug "7 - Create Project"
      debug "8 - Permissions"
-     debug "9 - Sair"
+     debug "9 - Alter .env"
+     debug "10 - Sair"
      debug ""
      debug "Enter the desired option:"
      read p
      case $p in
-     9) break;;
+     10) break;;
+     9) alter_env ;;
      8) path_permissions ;;
      7) create_project ;;
      6) check_composer_installation ;;
