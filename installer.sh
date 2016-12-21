@@ -21,6 +21,7 @@ main() {
   update_plataform
   check_gcc
   check_grep
+  check_webserver
   menu
   success
 }
@@ -879,6 +880,11 @@ alter_composer() {
   step "Changing the project composer"
   step_done
   install_jq
+  read -p "What is the project name [$PROJECT] ? " PROJECT
+  if [ -z "$PROJECT" ]; then
+    debug "The project name is required."
+    alter_composer
+  fi
   cd "$HTTPD_ROOT/$PROJECT"
   if [ -f "composer.json" ]; then
     if [ ! -f "composer.json.bkp" ]; then
@@ -916,6 +922,11 @@ alter_env() {
   step "Changing the .env file project"
   step_done
   install_sed
+  read -p "What is the project name [$PROJECT] ? " PROJECT
+  if [ -z "$PROJECT" ]; then
+    debug "The project name is required."
+    alter_env
+  fi
   cd "$HTTPD_ROOT/$PROJECT"
   if [ -f ".env" ]; then
     read -p "DB_HOST [127.0.0.1]: " DB_HOST
@@ -947,11 +958,11 @@ alter_env() {
 
     if [ ! -f ".env.bkp" ]; then
         debug "Backup .env"
-        cp .env .env.bkp
-        sed -i -e "s/\(DB_HOST=\).*/\1$DB_HOST/" \
-           -e "s/\(DB_DATABASE=\).*/\1$DB_DATABASE/" \
-           -e "s/\(DB_USERNAME=\).*/\1$DB_USERNAME/" \
-           -e "s/\(DB_PASSWORD=\).*/\1$DB_PASSWORD/" .env
+        super cp .env .env.bkp
+        super sed -i -e "s/\(DB_HOST=\).*/\1$DB_HOST/" \
+                     -e "s/\(DB_DATABASE=\).*/\1$DB_DATABASE/" \
+                     -e "s/\(DB_USERNAME=\).*/\1$DB_USERNAME/" \
+                     -e "s/\(DB_PASSWORD=\).*/\1$DB_PASSWORD/" .env
     fi
   else
     debug ".env not found"
@@ -973,6 +984,11 @@ install_sed() {
 path_permissions() {
   step "Changing permissions project"
   step_done
+  read -p "What is the project name [$PROJECT] ? " PROJECT
+  if [ -z "$PROJECT" ]; then
+    debug "The project name is required."
+    path_permissions
+  fi
   if [ -d "$HTTPD_ROOT/$PROJECT" ]; then
     cd "$HTTPD_ROOT/$PROJECT"
     if [ -d "logs" ]; then
@@ -990,6 +1006,11 @@ path_permissions() {
 config() {
   step "Project Setup"
   step_done
+  read -p "What is the project name [$PROJECT] ? " PROJECT
+  if [ -z "$PROJECT" ]; then
+    debug "The project name is required."
+    config
+  fi
   if [ -d "$HTTPD_ROOT/$PROJECT" ]; then
     cd "$HTTPD_ROOT/$PROJECT"
     if [ ! -f "config/app.bkp.php" ]; then
