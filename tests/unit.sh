@@ -2,11 +2,11 @@
 
 { # This ensures the entire script is downloaded
 
-    echo -e "|   Downloading script.sh to /tmp/script\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/script.sh --no-check-certificate https://raw.github.com/rbarros/installer.sh/dev/tests/script.sh)"
+    echo -e "|   Downloading script.sh to /tmp/script.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/script.sh --no-check-certificate https://raw.github.com/rbarros/installer.sh/dev/tests/script.sh)"
 
-if [ -f /tmp/script ]
+if [ -f /tmp/script.sh ]
 then
-    . ./tmp/script --source-only
+    . ./tmp/script.sh --source-only
     foo 3
 else
     # Show error
