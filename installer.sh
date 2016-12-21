@@ -951,9 +951,10 @@ alter_env() {
         step_done
         debug "Database $DB_DATABASE created"
     else
-        step_fail
-        add_report "Database $DB_DATABASE not created"
-        fail
+        #step_fail
+        #add_report "Database $DB_DATABASE not created"
+        #fail
+        warn "Database $DB_DATABASE not created"
     fi
 
     if [ ! -f ".env.bkp" ]; then
