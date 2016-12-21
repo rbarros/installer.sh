@@ -755,6 +755,8 @@ create_project() {
     debug "The project name is required."
     create_project
   fi
+  debug "# chown $USER:$group ~/.composer -hR"
+  sudo chown $USER:$group ~/.composer -hR
   if [ ! -d "$PROJECT" ]; then
     cd $HTTPD_ROOT
     #super mkdir "$HTTPD_ROOT/$PROJECT"
@@ -769,7 +771,7 @@ create_project() {
     debug "# chown <user_apache>:<grupo_user> $PROJECT -hR"
     super chown $user:$group $PROJECT -hR
     cd $PROJECT
-    composer install
+    super -v+ composer install
   else
     cd $HTTPD_ROOT
     debug "The project [$PROJECT] already exists!"
@@ -779,7 +781,7 @@ create_project() {
     debug "# chown <user_apache>:<grupo_user> $PROJECT -hR"
     super chown $user:$group $PROJECT -hR
     cd $PROJECT
-    composer update
+    super -v+ composer update
   fi
 }
 
