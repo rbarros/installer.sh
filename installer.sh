@@ -726,15 +726,29 @@ install_composer() {
 }
 
 create_project() {
+  check_mbstring_extension
+  check_zip_extension
   step "Create a project installer"
   step_done
   htdocs=""
   repo=""
+  user="www-data"
+  group=$(groups $USER | awk -F' ' '{ print $3 }')
+  read -p "What the user apache/nginx [$user] ? " user
+  if [ -z "$user" ]; then
+    debug "The user apache/nginx is required."
+    create_project
+  fi
+  read -p "What the group [$group] ? " group
+  if [ -z "$group" ]; then
+    debug "The group is required."
+    create_project
+  fi
   read -p "What the directory apache/nginx [$HTTPD_ROOT] ? " htdocs
   if [ "$htdocs" ]; then
     HTTPD_ROOT=$htdocs
   fi
-  read -p "What is the project name ? " PROJECT
+  read -p "What is the project name [$PROJECT] ? " PROJECT
   if [ -z "$PROJECT" ]; then
     debug "The project name is required."
     create_project
@@ -742,48 +756,119 @@ create_project() {
   if [ ! -d "$PROJECT" ]; then
     cd $HTTPD_ROOT
     #super mkdir "$HTTPD_ROOT/$PROJECT"
-    read -p "What the project repository ? " repo
+    read -p "What the project repository [$repo] ? " repo
     if [ -z "$repo" ]; then
       debug "The project repository is required."
       create_project
     fi
     super -v+ git clone $repo $PROJECT
     step "Permission path project"
-    case ${OS} in
-      ubuntu*)
-        step_done
-        super chown www-data:root $PROJECT -hR
-        ;;
-      debian*)
-        step_done
-        super chown www-data:root $PROJECT -hR
-        ;;
-      centos*)
-        step_done
-        super chown apache:root $PROJECT -hR
-        ;;
-      redhat*)
-        step_done
-        super chown apache:root $PROJECT -hR
-        ;;
-      fedora*)
-        step_done
-        super chown apache:root $PROJECT -hR
-        ;;
-      *)
-        step_fail
-        add_report "Cannot detect the current distro."
-        fail
-        ;;
-    esac
+    step_done
+    debug "# chown <user_apache>:<grupo_user> $PROJECT -hR"
+    super chown $user:$group $PROJECT -hR
     cd $PROJECT
     composer install
   else
+    cd $HTTPD_ROOT
     debug "The project [$PROJECT] already exists!"
     UPDATE="true"
-    cd "$HTTPD_ROOT/$PROJECT"
+    step "Permission path project"
+    step_done
+    debug "# chown <user_apache>:<grupo_user> $PROJECT -hR"
+    super chown $user:$group $PROJECT -hR
+    cd $PROJECT
     composer update
   fi
+}
+
+check_mbstring_extension() {
+  step "Check mbstring extension"
+  step_done
+  extension=$(php -m | grep -P mbstring)
+  if [ -z "$extension" ]; then
+    install_mbstring
+  fi
+}
+
+install_mbstring() {
+  step "Install mbstring"
+  case ${OS} in
+    ubuntu*)
+      step_done
+      super -v+ $PACKAGE install php7.0-mbstring
+      super service apache2 restart
+      ;;
+    debian*)
+      step_done
+      super -v+ $PACKAGE install php5-mbstring
+      super service apache2 restart
+      ;;
+    centos*)
+      step_done
+      super -v+ $PACKAGE install php70u-mbstring
+      super systemctl restart httpd.service
+      ;;
+    redhat*)
+      step_done
+      super -v+ $PACKAGE install php70u-mbstring
+      super systemctl restart httpd.service
+      ;;
+    fedora*)
+      step_done
+      super -v+ $PACKAGE install php70u-mbstring
+      super systemctl restart httpd.service
+      ;;
+    *)
+      step_fail
+      add_report "Cannot detect the current distro."
+      fail
+      ;;
+  esac
+}
+
+check_zip_extension() {
+  step "Check zip extension"
+  step_done
+  extension=$(php -m | grep -P zip)
+  if [ -z "$extension" ]; then
+    install_zip
+  fi
+}
+
+install_zip() {
+  step "Install zip"
+  case ${OS} in
+    ubuntu*)
+      step_done
+      super -v+ $PACKAGE install php7.0-zip
+      super service apache2 restart
+      ;;
+    debian*)
+      step_done
+      super -v+ $PACKAGE install php5-zip
+      super service apache2 restart
+      ;;
+    centos*)
+      step_done
+      super -v+ $PACKAGE install php70u-zip
+      super systemctl restart httpd.service
+      ;;
+    redhat*)
+      step_done
+      super -v+ $PACKAGE install php70u-zip
+      super systemctl restart httpd.service
+      ;;
+    fedora*)
+      step_done
+      super -v+ $PACKAGE install php70u-zip
+      super systemctl restart httpd.service
+      ;;
+    *)
+      step_fail
+      add_report "Cannot detect the current distro."
+      fail
+      ;;
+  esac
 }
 
 alter_composer() {
@@ -887,13 +972,13 @@ path_permissions() {
   if [ -d "$HTTPD_ROOT/$PROJECT" ]; then
     cd "$HTTPD_ROOT/$PROJECT"
     if [ -d "logs" ]; then
-      super chmod -R 777 "logs"
+      super chmod -R 755 "logs"
     fi
     if [ -d "public/arquivos" ]; then
-      super chmod -R 777 "public/arquivos"
+      super chmod -R 755 "public/arquivos"
     fi
     if [ -d "storage" ]; then
-      super chmod -R 777 "storage"
+      super chmod -R 755 "storage"
     fi
   fi
 }
