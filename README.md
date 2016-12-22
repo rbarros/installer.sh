@@ -8,12 +8,12 @@ You do not need to install anything, just run the script below.
 
 ## via curl
 ```
-bash <(curl -s https://raw.githubusercontent.com/rbarros/installer.sh/dev/installer.sh)
+bash <(curl -s https://raw.githubusercontent.com/rbarros/installer.sh/master/installer.sh)
 ```
 
 ## via wget
 ```
-bash <(wget https://raw.githubusercontent.com/rbarros/installer.sh/dev/installer.sh -O -)
+bash <(wget https://raw.githubusercontent.com/rbarros/installer.sh/master/installer.sh -O -)
 ```
 
 ## Release History
