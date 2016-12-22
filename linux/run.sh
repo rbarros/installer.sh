@@ -4,10 +4,32 @@
 
   check_distro() {
     step "Checking distro platform"
-    # Detecting OS and OS_VERSION
-    . /etc/os-release
-    OS=$ID
-    OS_VERSION=$VERSION_ID
+
+    if [[ -e /etc/os-release ]]; then
+      # Detecting OS and OS_VERSION
+      . /etc/os-release
+      OS=$ID
+      OS_VERSION=$VERSION_ID
+    fi
+
+    if [[ -e /etc/redhat-release ]]; then
+      RELEASE_RPM=$(rpm -qf /etc/redhat-release)
+      RELEASE=$(rpm -q --qf '%{VERSION}' ${RELEASE_RPM})
+      OS_VERSION=RELEASE
+      case ${RELEASE_RPM} in
+        centos*)
+          OS="centos"
+          ;;
+        redhat*)
+          OS="redhat"
+          ;;
+        *)
+          echo "unknown EL clone"
+          exit 1
+          ;;
+      esac
+    fi
+
     step_done
     debug "Detected distribution: $OS, $OS_VERSION"
 
