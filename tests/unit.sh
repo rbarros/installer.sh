@@ -1,7 +1,5 @@
 #!/bin/bash
 
-. ./installer.sh
-
 typeset -i tests_run=0
 function try { this="$1"; }
 trap 'printf "$0: exit code $? on line $LINENO\nFAIL: $this\n"; exit 1' ERR
