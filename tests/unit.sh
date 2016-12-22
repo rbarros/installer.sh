@@ -1,16 +1,19 @@
 #!/bin/bash
 
-{ # This ensures the entire script is downloaded
+. ./installer.sh
 
-    echo -e "|   Downloading script.sh to /tmp/script.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/script.sh --no-check-certificate https://raw.github.com/rbarros/installer.sh/dev/tests/script.sh)"
+typeset -i tests_run=0
+function try { this="$1"; }
+trap 'printf "$0: exit code $? on line $LINENO\nFAIL: $this\n"; exit 1' ERR
+function assert {
+        let tests_run+=1
+        [ "$1" = "$2" ] && { echo -n "."; return; }
+        printf "\nFAIL: $this\n'$1' != '$2'\n"; exit 1
+}
 
-if [ -f /tmp/script.sh ]
-then
-    . /tmp/script.sh --source-only
-    foo 3
-else
-    # Show error
-    echo -e "|\n|   Error: The script could not be downloaded\n|"
-fi
+try "test echo"
+# ...
+assert "`echo abc`" "abc"
 
-} # This ensures the entire script is downloaded
+echo; echo "PASS: $tests_run tests run"
+

@@ -3,6 +3,7 @@
 { # This ensures the entire script is downloaded
 
     foo() {
+        echo $VERSION
         echo foo $1
     }
 
