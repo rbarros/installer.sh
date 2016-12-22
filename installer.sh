@@ -4,7 +4,7 @@
 
 VERSION="0.1.0"
 LOCAL_RAW=http://localhost/installer.sh
-REMOTE_RAW=https://raw.github.com/rbarros/installer.sh
+REMOTE_RAW=https://raw.github.com/rbarros/installer.sh/dev
 ROOT_UID=0
 ARRAY_SEPARATOR="#"
 OS=""
