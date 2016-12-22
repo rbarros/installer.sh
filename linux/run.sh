@@ -6,22 +6,21 @@
     step "Checking distro platform"
 
     if [[ -e /etc/os-release ]]; then
-      # Detecting OS and OS_VERSION
+      # Detecting DISTRO and RELEASE
       . /etc/os-release
-      OS=$ID
-      OS_VERSION=$VERSION_ID
+      DISTRO=$ID
+      RELEASE=$VERSION_ID
     fi
 
     if [[ -e /etc/redhat-release ]]; then
       RELEASE_RPM=$(rpm -qf /etc/redhat-release)
       RELEASE=$(rpm -q --qf '%{VERSION}' ${RELEASE_RPM})
-      OS_VERSION=RELEASE
       case ${RELEASE_RPM} in
         centos*)
-          OS="centos"
+          DISTRO="centos"
           ;;
         redhat*)
-          OS="redhat"
+          DISTRO="redhat"
           ;;
         *)
           echo "unknown EL clone"
@@ -31,33 +30,33 @@
     fi
 
     step_done
-    debug "Detected distribution: $OS, $OS_VERSION"
+    debug "Detected distribution: $DISTRO, $RELEASE"
 
     step "Get package distro"
-    case ${OS} in
+    case ${DISTRO} in
       ubuntu*)
         step_done
-        #debug "detected Ubuntu ${OS_VERSION}"
+        #debug "detected Ubuntu ${RELEASE}"
         PACKAGE="apt-get"
         ;;
       debian*)
         step_done
-        #debug "detected Debian ${OS_VERSION}"
+        #debug "detected Debian ${RELEASE}"
         PACKAGE="apt-get"
         ;;
       centos*)
         step_done
-        #debug "detected CentOS ${OS_VERSION}"
+        #debug "detected CentOS ${RELEASE}"
         PACKAGE="yum"
         ;;
       redhat*)
         step_done
-        #debug "detected RHEL ${OS_VERSION}"
+        #debug "detected RHEL ${RELEASE}"
         PACKAGE="yum"
         ;;
       fedora*)
         step_done
-        #debug "detected Fedora ${OS_VERSION}"
+        #debug "detected Fedora ${RELEASE}"
         PACKAGE="yum"
         ;;
       *)
@@ -78,7 +77,7 @@
     counter
 
     if [ "$STOP" = 0 ]; then
-      step_wait "Update $OS, $OS_VERSION ..."
+      step_wait "Update $DISTRO, $RELEASE ..."
       if update_distro; then
         step_done
       fi
@@ -209,7 +208,7 @@
 
   install_httpd() {
     step "Install webserver"
-    case ${OS} in
+    case ${DISTRO} in
       ubuntu*)
         step_done
         debug "Install webserver ubuntu"
@@ -269,7 +268,7 @@
 
   install_php() {
     step "Install php"
-    case ${OS} in
+    case ${DISTRO} in
       ubuntu*)
         step_done
         debug "Install php ubuntu"
@@ -381,7 +380,7 @@
 
   install_mysql() {
     step "Install mysql"
-    case ${OS} in
+    case ${DISTRO} in
       ubuntu*)
         step_done
         super -v+ $PACKAGE install mariadb-server mariadb-client
@@ -418,7 +417,7 @@
 
   oracle_instant() {
     step "Install oracle instant"
-    case ${OS} in
+    case ${DISTRO} in
       ubuntu*)
         step_done
         super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
@@ -517,7 +516,7 @@
 
   install_pear() {
     step "Install php"
-    case ${OS} in
+    case ${DISTRO} in
       ubuntu*)
         step_done
         super -v+ $PACKAGE install php-pear build-essential php7.0-dev #build-dep
@@ -758,7 +757,7 @@
 
   install_mbstring() {
     step "Install mbstring"
-    case ${OS} in
+    case ${DISTRO} in
       ubuntu*)
         step_done
         super -v+ $PACKAGE install php7.0-mbstring
@@ -803,7 +802,7 @@
 
   install_zip() {
     step "Install zip"
-    case ${OS} in
+    case ${DISTRO} in
       ubuntu*)
         step_done
         super -v+ $PACKAGE install php7.0-zip
