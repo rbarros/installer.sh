@@ -620,6 +620,7 @@
       step_done
       debug "Git detected"
       check_git
+      check_git_installation
     fi
     check_git_config
   }
