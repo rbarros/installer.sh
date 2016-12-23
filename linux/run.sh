@@ -12,6 +12,14 @@
       RELEASE=$VERSION_ID
     fi
 
+    # Docker containers
+    if [[ -e /etc/lsb-relase ]]; then
+      # Detecting DISTRO and RELEASE
+      . /etc/lsb-relase
+      DISTRO=$($DISTRIB_ID | awk '{print tolower($0)}')
+      RELEASE=$DISTRIB_RELEASE
+    fi
+
     if [[ -e /etc/redhat-release ]]; then
       RELEASE_RPM=$(rpm -qf /etc/redhat-release)
       RELEASE=$(rpm -q --qf '%{VERSION}' ${RELEASE_RPM})
