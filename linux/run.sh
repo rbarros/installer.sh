@@ -13,10 +13,10 @@
     fi
 
     # Docker containers
-    if [[ -e /etc/lsb-relase ]]; then
+    if [[ -e /etc/lsb-release ]]; then
       # Detecting DISTRO and RELEASE
-      . /etc/lsb-relase
-      DISTRO=$($DISTRIB_ID | awk '{print tolower($0)}')
+      . /etc/lsb-release
+      DISTRO=$( echo $DISTRIB_ID | awk '{print tolower($0)}')
       RELEASE=$DISTRIB_RELEASE
     fi
 
