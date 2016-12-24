@@ -642,11 +642,17 @@
     super ln -s /usr/lib/oracle/11.2/client64/lib/libnnz11.so /usr/lib/libnnz11.so
 
     cd ~
-    recommended_version=7.0.0
-    if version_gt $recommended_version $PHP_VERSION; then
-      curl_or_wget "http://museum.php.net/php5/php-$PHP_VERSION.tar.bz2" "php-$PHP_VERSION.tar.bz2"
-    else
-      curl_or_wget "http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror" "php-$PHP_VERSION.tar.bz2"
+    if [ ! -f "php-$PHP_VERSION.tar.bz2" ]; then
+      recommended_version=7.0.0
+      if version_gt $recommended_version $PHP_VERSION; then
+        curl_or_wget "http://museum.php.net/php5/php-$PHP_VERSION.tar.bz2" "php-$PHP_VERSION.tar.bz2"
+        super -v+ $PACKAGE install libaio1 libaio-dev
+      else
+        curl_or_wget "http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror" "php-$PHP_VERSION.tar.bz2"
+      fi
+    fi
+    if [ ! -d /usr/include/php ]; then
+      ln -s /usr/include/php5 /usr/include/php
     fi
     tar -jxvf php-$PHP_VERSION.tar.bz2
     cd php-$PHP_VERSION/ext/pdo_oci/
@@ -659,8 +665,10 @@
       super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php/7.0/mods-available/pdo_oci.ini'
       super ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/apache2/conf.d/20-pdo_oci.ini
       super ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/cli/conf.d/20-pdo_oci.ini
-    else
-      super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php.d/20-pdo_oci.ini'
+    elif [ -d "/etc/php5/conf.d/" ]
+      super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php5/conf.d/pdo_oci.ini'
+      super ln -s /etc/php5/conf.d/pdo_oci.ini /etc/php5/apache2/conf.d/20-pdo_oci.ini
+      super ln -s /etc/php5/conf.d/pdo_oci.ini /etc/php5/cli/conf.d/20-pdo_oci.ini
     fi
     php -i | grep oci
     super bash -c 'echo -e "<?php phpinfo(); " > $HTTPD_ROOT/phpinfo.php'
