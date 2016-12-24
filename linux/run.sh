@@ -558,6 +558,9 @@
     debug "Use 'instantclient,/path/to/instant/client/lib' if you're compiling with Oracle Instant Client [autodetect] : copy and paste instantclient,/usr/lib/oracle/11.2/client64/lib"
     debug "http://www.oracle.com/technetwork/articles/technote-php-instant-084410.html"
     export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
+    super ln -nsf /usr/lib/oracle/11.2/client64/ /usr/lib/oracle/11.2/client
+    super ln -nsf /usr/include/oracle/11.2/client64/ /usr/include/oracle/11.2/client
+    super ln -s /usr/lib/oracle/11.2/client64/lib/libnnz11.so /usr/lib/libnnz11.so
     if command_exists pecl; then
       debug "pecl is installed, skipping pecl installation."
     else
