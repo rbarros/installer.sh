@@ -555,7 +555,8 @@
     debug "Use 'pecl install oci8' to install for PHP 7."
     debug "Use 'pecl install oci8-2.0.12' to install for PHP 5.2 - PHP 5.6."
     debug "Use 'pecl install oci8-1.4.10' to install for PHP 4.3.9 - PHP 5.1."
-    debug "Use 'instantclient,/path/to/instant/client/lib' if you're compiling with Oracle Instant Client [autodetect] : copy and paste instantclient,/usr/lib/oracle/11.2/client64/lib"
+    debug "Use 'instantclient,/path/to/instant/client/lib' if you're compiling with Oracle Instant Client [autodetect] :"
+    debug "copy and paste instantclient,/usr/lib/oracle/11.2/client64/lib"
     debug "http://www.oracle.com/technetwork/articles/technote-php-instant-084410.html"
     export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
     super ln -nsf /usr/lib/oracle/11.2/client64/ /usr/lib/oracle/11.2/client
@@ -622,12 +623,16 @@
   }
 
   install_pdo_oci8() {
+    # https://secure.php.net/releases/
     step "Install pdo oci8"
     step_done
     PHP_VERSION=$(php -v | cut -d' ' -f 2 | head -n 1 | awk -F - '{ print $1 }')
     export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
 
     #checking for oci.h... configure: error: I'm too dumb to figure out where the include dir is in your instant client install
+    #sudo ln -s /usr/local/instantclient_12_1 /usr/local/instantclient
+    #sudo ln -s /usr/local/instantclient_12_1/libclntsh.so.12.1 /usr/local/instantclient/libclntsh.so
+    #sudo ln -s /usr/local/instantclient/sqlplus /usr/bin/sqlplus
     #sudo ln -nsf /usr/lib/oracle/12.1/client64/ /usr/lib/oracle/12.1/client
     #sudo ln -nsf /usr/include/oracle/12.1/client64/ /usr/include/oracle/12.1/client
     #sudo ln -s /usr/lib/oracle/12.1/client64/lib/libnnz12.so /usr/lib64/libnnz12.so
@@ -637,7 +642,12 @@
     super ln -s /usr/lib/oracle/11.2/client64/lib/libnnz11.so /usr/lib/libnnz11.so
 
     cd ~
-    curl_or_wget "http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror" "php-$PHP_VERSION.tar.bz2"
+    recommended_version=7.0.0
+    if version_gt $recommended_version $PHP_VERSION; then
+      curl_or_wget "http://museum.php.net/php5/php-$PHP_VERSION.tar.bz2" "php-$PHP_VERSION.tar.bz2"
+    else
+      curl_or_wget "http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror" "php-$PHP_VERSION.tar.bz2"
+    fi
     tar -jxvf php-$PHP_VERSION.tar.bz2
     cd php-$PHP_VERSION/ext/pdo_oci/
     phpize
