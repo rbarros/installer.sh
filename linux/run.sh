@@ -409,8 +409,7 @@
   }
 
   el5_download_install() {
-    fetch_cmd=$(curl_or_wget)
-    $fetch_cmd -O /tmp/release.rpm ${1}
+    curl_or_wget "${1}" "/tmp/release.rpm"
     super -v+ $PACKAGE -y localinstall /tmp/release.rpm
     rm -f /tmp/release.rpm
   }
@@ -486,14 +485,13 @@
 
   oracle_instant() {
     step "Install oracle instant"
-    fetch_cmd=$(curl_or_wget)
     case ${DISTRO} in
       ubuntu*)
         step_done
-        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
-        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
-        super -v+ dpkg -i oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
-        super -v+ dpkg -i oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
+        curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb" "/tmp/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb"
+        curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb" "/tmp/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb"
+        super -v+ dpkg -i /tmp/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
+        super -v+ dpkg -i /tmp/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
         super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
 
         # SQLSTATE[HY000]: pdo_oci_handle_factory; ORA-12546: TNS: permission denied (/home/user/php-7.0.6/ext/pdo_oci/)
@@ -501,10 +499,10 @@
         ;;
       debian*)
         step_done
-        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
-        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
-        super -v+ dpkg -i oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
-        super -v+ dpkg -i oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
+        curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb" "/tmp/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb"
+        curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb" "/tmp/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb"
+        super -v+ dpkg -i /tmp/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
+        super -v+ dpkg -i /tmp/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
         super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
 
         # SQLSTATE[HY000]: pdo_oci_handle_factory; ORA-12546: TNS: permission denied (/home/user/php-7.0.6/ext/pdo_oci/)
@@ -512,10 +510,10 @@
         ;;
       centos*)
         step_done
-        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
-        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
-        super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
-        super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+        curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm" "/tmp/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm"
+        curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm" "/tmp/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm"
+        super -v+ $PACKAGE -y localinstall /tmp/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+        super -v+ $PACKAGE -y localinstall /tmp/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
         super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
 
         # SQLSTATE[HY000]: pdo_oci_handle_factory; ORA-12546: TNS: permission denied (/home/user/php-7.0.6/ext/pdo_oci/)
@@ -523,10 +521,10 @@
         ;;
       redhat*)
         step_done
-        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
-        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
-        super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
-        super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+        curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm" "/tmp/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm"
+        curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm" "/tmp/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm"
+        super -v+ $PACKAGE -y localinstall /tmp/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+        super -v+ $PACKAGE -y localinstall /tmp/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
         super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
 
         # SQLSTATE[HY000]: pdo_oci_handle_factory; ORA-12546: TNS: permission denied (/home/user/php-7.0.6/ext/pdo_oci/)
@@ -534,10 +532,10 @@
         ;;
       fedora*)
         step_done
-        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
-        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
-        super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
-        super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+        curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm" "/tmp/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm"
+        curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm" "/tmp/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm"
+        super -v+ $PACKAGE -y localinstall /tmp/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+        super -v+ $PACKAGE -y localinstall /tmp/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
         super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
 
         # SQLSTATE[HY000]: pdo_oci_handle_factory; ORA-12546: TNS: permission denied (/home/user/php-7.0.6/ext/pdo_oci/)
@@ -636,8 +634,7 @@
     super ln -s /usr/lib/oracle/11.2/client64/lib/libnnz11.so /usr/lib/libnnz11.so
 
     cd ~
-    fetch_cmd=$(curl_or_wget)
-    $fetch_cmd -L http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror> php-$PHP_VERSION.tar.bz2
+    curl_or_wget "http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror" "php-$PHP_VERSION.tar.bz2"
     tar -jxvf php-$PHP_VERSION.tar.bz2
     cd php-$PHP_VERSION/ext/pdo_oci/
     phpize
@@ -731,7 +728,6 @@
     step "Checking Composer installation"
     step_done
 
-    fetch_cmd=$(curl_or_wget)
     if command_exists composer; then
       debug "Composer is installed, skipping Composer installation."
       debug "  To update Composer, run the command bellow:"
@@ -752,8 +748,7 @@
     step "Installing composer"
     step_done
     if [ ! -f "composer.phar" ]; then
-      fetch_cmd=$(curl_or_wget)
-      $fetch_cmd -O https://getcomposer.org/composer.phar
+      curl_or_wget "https://getcomposer.org/composer.phar" "composer.phar"
     fi
     if comfirm "Move composer /usr/bin/composer ?"; then
         super mv composer.phar /usr/bin/composer

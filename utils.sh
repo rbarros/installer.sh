@@ -31,24 +31,10 @@
 
   curl_or_wget() {
     CURL_BIN="curl"; WGET_BIN="wget"
-    # if [ "$1" = "-c" ]; then
-    #   shift
-    #   if command_exists ${CURL_BIN}; then
-    #     echo "${CURL_BIN} -sSL ${@}"
-    #   elif command_exists ${WGET_BIN}; then
-    #     echo "${WGET_BIN} -nv -O- -t 2 -T 10 ${@}"
-    #   fi
-    # else
-    #   if command_exists ${CURL_BIN}; then
-    #     echo "${CURL_BIN} -O ${@}"
-    #   elif command_exists ${WGET_BIN}; then
-    #     echo "${WGET_BIN} -O ${@}"
-    #   fi
-    # fi
     if command_exists ${CURL_BIN}; then
-      echo "${CURL_BIN}"
+      $CURL_BIN -SL "$1" > "$2"
     elif command_exists ${WGET_BIN}; then
-      echo "${WGET_BIN}"
+      $WGET_BIN -v -O- -t 2 -T 10 "$1" > "$2"
     fi
   }
 
