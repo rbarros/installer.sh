@@ -181,11 +181,6 @@
     done
   }
 
-  download() {
-    # Download plugin
-    echo -e "|   Downloading installer.sh to /etc/installersh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer.sh --no-check-certificate https://raw.github.com/rbarros/installer.sh/dev/installer.sh)"
-  }
-
   install_lamp() {
     step "Install LAMP"
     step_done
@@ -279,16 +274,61 @@
     case ${DISTRO} in
       ubuntu*)
         step_done
-        debug "Install php ubuntu"
-        super -v+ $PACKAGE install php7.0 php7.0-dev php7.0-mcrypt php7.0-common php7.0-curl php7.0-cli php7.0-gd php7.0-json php7.0-xml libapache2-mod-php7.0 php7.0-zip php-pear build-essential #build-dep
-        super -v+ a2enmod rewrite
+        # 15.10  wily       jessie / sid
+        # 15.04  vivid      jessie / sid
+        # 14.10  utopic     jessie / sid
+        # 14.04  trusty     jessie / sid
+        # 13.10  saucy      wheezy / sid
+        # 13.04  raring     wheezy / sid
+        # 12.10  quantal    wheezy / sid
+        # 12.04  precise    wheezy / sid
+        # 11.10  oneiric    wheezy / sid
+        # 11.04  natty      squeeze / sid
+        # 10.10  maverick   squeeze / sid
+        # 10.04  lucid      squeeze / sid
+        #
+        # This PPA contains latest PHP 5.5 packaged for Ubuntu 14.04 LTS (Trusty).
+        #
+        # You can get more information about the packages at https://deb.sury.org
+        #
+        # If you need other PHP versions use:
+        # PHP 5.4: ppa:ondrej/php5-oldstable (Ubuntu 12.04 LTS)
+        # PHP 5.5: ppa:ondrej/php5 (Ubuntu 14.04 LTS)
+        # PHP 5.6: ppa:ondrej/php5-5.6 (Ubuntu 14.04 LTS - Ubuntu 16.04 LTS)
+        # PHP 5.6 and PHP 7.0: ppa:ondrej/php (Ubuntu 14.04 LTS - Ubuntu 16.04 LTS)
+        #
+        # BUGS&FEATURES: This PPA now has a issue tracker: https://deb.sury.org/pages/bugreporting.html
+        # PLEASE READ: If you like my work and want to give me a little motivation, please consider donating: https://deb.sury.org/pages/donate.html
+        # WARNING: add-apt-repository is broken with non-UTF-8 locales, see https://github.com/oerdnj/deb.sury.org/issues/56 for workaround:
+        # # apt-get install -y language-pack-en-base
+        # # LC_ALL=en_US.UTF-8 add-apt-repository ppa:ondrej/php5
+        # $ sudo add-apt-repository ppa:ondrej/php5-5.6
+        # $ sudo apt-get update
+        # $ sudo apt-get upgrade
+        # $ sudo apt-get autoremove
+        # $ sudo apt-get install php5
+        #
+        case ${RELEASE} in
+          12*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-12.sh)";;
+          14*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-14.sh)";;
+          16*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-16.sh)";;
+        esac
+
+        if [ -f /tmp/installer-php.sh ]; then
+            . /tmp/installer-php.sh
+            php_main
+        else
+            # Show error
+            echo -e "|\n|   Error: The php.sh could not be downloaded\n|"
+        fi
         ;;
       debian*)
         step_done
-        debug "Install php debian"
-        #super -v+ $PACKAGE install php7.0 php7.0-dev php7.0-mcrypt php7.0-common php7.0-curl php7.0-cli php7.0-gd php7.0-json php7.0-xml libapache2-mod-php7.0 php7.0-zip php-pear build-essential build-dep
-        super -v+ $PACKAGE install php5 php5-dev php5-mcrypt php5-common php5-curl php5-cli php5-gd php5-json php5-xml libapache2-mod-php5 libphp-pclzip php-pear build-essential #build-dep
-        super -v+ a2enmod rewrite
+        case ${RELEASE} in
+          6*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-14.sh)";;
+          7*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-14.sh)";;
+          8*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-14.sh)";;
+        esac
         ;;
       centos*)
         step_done
