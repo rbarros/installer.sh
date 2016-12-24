@@ -196,16 +196,20 @@
 
     if command_exists apache2; then
       SERVER="apache2"
-      HTTPD_ROOT="/var/www/html"
+      if [ -d "/var/www/html" ]; then
+        HTTPD_ROOT="/var/www/html"
+      elif [ -d "/var/www" ]; then
+        HTTPD_ROOT="/var/www"
+      fi
     elif command_exists nginx; then
       SERVER="nginx"
       HTTPD_ROOT="/usr/share/nginx/html"
+    else
+      install_httpd
     fi
     if [ -d "$HTTPD_ROOT" ]; then
       debug $($SERVER -v)
       debug "ok [$HTTPD_ROOT]"
-    else
-      install_httpd
     fi
   }
 
