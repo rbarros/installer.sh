@@ -2,6 +2,10 @@
 
 { # This ensures the entire script is downloaded
 
+  download() {
+    echo -e "|   Downloading installer-$1.sh to /tmp/installer-$1.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-$1.sh --no-check-certificate $URL/$2.sh)"
+  }
+
   counter() {
     for i in {0..10}; do
       echo -ne "$i"'\r';
@@ -24,7 +28,6 @@
               ;;
       esac
   }
-
 
   curl_or_wget() {
     CURL_BIN="curl"; WGET_BIN="wget"

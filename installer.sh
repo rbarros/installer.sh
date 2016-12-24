@@ -89,7 +89,7 @@
   }
 
   download_linux() {
-    echo -e "|   Downloading installer-linux-run.sh to /tmp/installer-linux-run.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-linux-run.sh --no-check-certificate $URL/linux/run.sh)"
+    download "linux-run" "linux/run"
 
     if [ -f /tmp/installer-linux-run.sh ]; then
         . /tmp/installer-linux-run.sh

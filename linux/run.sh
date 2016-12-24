@@ -313,25 +313,17 @@
         # $ sudo apt-get install php5
         #
         case ${RELEASE} in
-          12*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-12.sh)";;
-          14*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-14.sh)";;
-          16*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-16.sh)";;
+          12*) download "php" "linux/ubuntu/php-12";;
+          14*) download "php" "linux/ubuntu/php-14";;
+          16*) download "php" "linux/ubuntu/php-16";;
         esac
-
-        if [ -f /tmp/installer-php.sh ]; then
-            . /tmp/installer-php.sh
-            php_main
-        else
-            # Show error
-            echo -e "|\n|   Error: The php.sh could not be downloaded\n|"
-        fi
         ;;
       debian*)
         step_done
         case ${RELEASE} in
-          6*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-14.sh)";;
-          7*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-14.sh)";;
-          8*) echo -e "|   Downloading installer-php.sh to /tmp/installer-php.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-php.sh --no-check-certificate $URL/linux/ubuntu/php-14.sh)";;
+          6*) download "php" "linux/ubuntu/php-12";;
+          7*) download "php" "linux/ubuntu/php-14";;
+          8*) download "php" "linux/ubuntu/php-16";;
         esac
         ;;
       centos*)
@@ -365,6 +357,14 @@
         fail
         ;;
     esac
+
+    if [ -f /tmp/installer-php.sh ]; then
+        . /tmp/installer-php.sh
+        php_main
+    else
+        # Show error
+        echo -e "|\n|   Error: The php.sh could not be downloaded\n|"
+    fi
   }
 
   centos_install_epel(){
@@ -435,11 +435,19 @@
     case ${DISTRO} in
       ubuntu*)
         step_done
-        super -v+ $PACKAGE install mariadb-server mariadb-client
+        case ${RELEASE} in
+          12*) download "mysql" "linux/ubuntu/mysql-12";;
+          14*) download "mysql" "linux/ubuntu/mysql-14";;
+          16*) download "mysql" "linux/ubuntu/mysql-16";;
+        esac
         ;;
       debian*)
         step_done
-        super -v+ $PACKAGE install mysql-server mysql-client
+        case ${RELEASE} in
+          6*) download "mysql" "linux/ubuntu/mysql-12";;
+          7*) download "mysql" "linux/ubuntu/mysql-14";;
+          8*) download "mysql" "linux/ubuntu/mysql-16";;
+        esac
         ;;
       centos*)
         step_done
@@ -465,6 +473,14 @@
         fail
         ;;
     esac
+
+    if [ -f /tmp/installer-mysql.sh ]; then
+        . /tmp/installer-mysql.sh
+        mysql_main
+    else
+        # Show error
+        echo -e "|\n|   Error: The php.sh could not be downloaded\n|"
+    fi
   }
 
   oracle_instant() {
