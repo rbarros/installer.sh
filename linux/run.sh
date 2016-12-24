@@ -408,8 +408,9 @@
     import_ius_key
   }
 
-  el5_download_install(){
-    wget -O /tmp/release.rpm ${1}
+  el5_download_install() {
+    fetch_cmd=$(curl_or_wget)
+    $fetch_cmd -O /tmp/release.rpm ${1}
     super -v+ $PACKAGE -y localinstall /tmp/release.rpm
     rm -f /tmp/release.rpm
   }
@@ -485,11 +486,12 @@
 
   oracle_instant() {
     step "Install oracle instant"
+    fetch_cmd=$(curl_or_wget)
     case ${DISTRO} in
       ubuntu*)
         step_done
-        super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
-        super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
+        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
+        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
         super -v+ dpkg -i oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
         super -v+ dpkg -i oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
         super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
@@ -499,8 +501,8 @@
         ;;
       debian*)
         step_done
-        super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
-        super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
+        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
+        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
         super -v+ dpkg -i oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
         super -v+ dpkg -i oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
         super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
@@ -510,8 +512,8 @@
         ;;
       centos*)
         step_done
-        super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
-        super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
         super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
         super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
         super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
@@ -521,8 +523,8 @@
         ;;
       redhat*)
         step_done
-        super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
-        super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
         super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
         super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
         super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
@@ -532,8 +534,8 @@
         ;;
       fedora*)
         step_done
-        super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
-        super curl -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+        super $fetch_cmd -O https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
         super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
         super -v+ $PACKAGE -y localinstall oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
         super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
@@ -634,7 +636,8 @@
     super ln -s /usr/lib/oracle/11.2/client64/lib/libnnz11.so /usr/lib/libnnz11.so
 
     cd ~
-    curl -L http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror> php-$PHP_VERSION.tar.bz2
+    fetch_cmd=$(curl_or_wget)
+    $fetch_cmd -L http://br2.php.net/get/php-$PHP_VERSION.tar.bz2/from/this/mirror> php-$PHP_VERSION.tar.bz2
     tar -jxvf php-$PHP_VERSION.tar.bz2
     cd php-$PHP_VERSION/ext/pdo_oci/
     phpize
@@ -749,7 +752,8 @@
     step "Installing composer"
     step_done
     if [ ! -f "composer.phar" ]; then
-      curl -O https://getcomposer.org/composer.phar
+      fetch_cmd=$(curl_or_wget)
+      $fetch_cmd -O https://getcomposer.org/composer.phar
     fi
     if comfirm "Move composer /usr/bin/composer ?"; then
         super mv composer.phar /usr/bin/composer
