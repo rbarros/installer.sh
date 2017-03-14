@@ -665,7 +665,7 @@
       super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php/7.0/mods-available/pdo_oci.ini'
       super ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/apache2/conf.d/20-pdo_oci.ini
       super ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/cli/conf.d/20-pdo_oci.ini
-    elif [ -d "/etc/php5/conf.d/" ]
+    elif [ -d "/etc/php5/conf.d/" ]; then
       super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php5/conf.d/pdo_oci.ini'
       super ln -s /etc/php5/conf.d/pdo_oci.ini /etc/php5/apache2/conf.d/20-pdo_oci.ini
       super ln -s /etc/php5/conf.d/pdo_oci.ini /etc/php5/cli/conf.d/20-pdo_oci.ini
