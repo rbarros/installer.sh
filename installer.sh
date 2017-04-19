@@ -78,7 +78,7 @@
   }
 
   download_utils() {
-    echo -e "|   Downloading installer-utils.sh to /tmp/installer-utils.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-utils.sh --no-check-certificate $URL/utils.sh)"
+    echo -e "|   Downloading installer-utils.sh to /tmp/installer-utils.sh\n|\n|   + $(curl_or_wget $URL/utils.sh /tmp/installer-utils.sh)"
 
     if [ -f /tmp/installer-utils.sh ]; then
         . /tmp/installer-utils.sh
@@ -103,6 +103,19 @@
 
     menu
     success
+  }
+
+  curl_or_wget() {
+    CURL_BIN="curl"; WGET_BIN="wget"
+    if command_exists ${CURL_BIN}; then
+      $CURL_BIN -SL "$1" > "$2"
+    elif command_exists ${WGET_BIN}; then
+      $WGET_BIN -v -O- -t 2 -T 10 "$1" > "$2"
+    fi
+  }
+
+  command_exists() {
+    command -v "${@}" > /dev/null 2>&1
   }
 
   main "${@}"

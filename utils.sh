@@ -3,7 +3,7 @@
 { # This ensures the entire script is downloaded
 
   download() {
-    echo -e "|   Downloading installer-$1.sh to /tmp/installer-$1.sh\n|\n|   + $(wget -nv -o /dev/stdout -O /tmp/installer-$1.sh --no-check-certificate $URL/$2.sh)"
+    echo -e "|   Downloading installer-$1.sh to /tmp/installer-$1.sh\n|\n|   + $(curl_or_wget $URL/$2.sh /tmp/installer-$1.sh)"
   }
 
   counter() {
