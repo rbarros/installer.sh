@@ -25,6 +25,7 @@
 
   main() {
     welcome
+    clean
     download_utils
     check_plataform
   }
@@ -42,6 +43,14 @@
     printf '%s\n'
     printf '%s\n' 'p.s. Follow us at http://github.com/rbarros/installer.sh'
     printf '%s\n' '------------------------------------------------------------------'
+  }
+
+  clean() {
+    GREEN="$(tput setaf 2)"
+    printf '%s' "$GREEN"
+    printf '%s\n' 'Clean scripts downloaded...'
+    rm /tmp/installer-*.sh
+    printf '%s\n'
   }
 
   check_plataform() {
