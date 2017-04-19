@@ -316,6 +316,7 @@
           12*) download "php" "linux/ubuntu/php-12";;
           14*) download "php" "linux/ubuntu/php-14";;
           16*) download "php" "linux/ubuntu/php-16";;
+	  17*) download "php" "linux/ubuntu/php-17";;
         esac
         ;;
       debian*)
@@ -439,6 +440,7 @@
           12*) download "mysql" "linux/ubuntu/mysql-12";;
           14*) download "mysql" "linux/ubuntu/mysql-14";;
           16*) download "mysql" "linux/ubuntu/mysql-16";;
+	  17*) download "mysql" "linux/ubuntu/mysql-17";;
         esac
         ;;
       debian*)
