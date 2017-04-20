@@ -6,6 +6,16 @@
     echo -e "|   Downloading installer-$1.sh to /tmp/installer-$1.sh\n|\n|   + $(curl_or_wget $URL/$2.sh /tmp/installer-$1.sh)"
   }
 
+  version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+
+  verlte() {
+      [  "$1" = "`echo -e "$1\n$2" | sort -n | head -n1`" ]
+  }
+
+  verlt() {
+      [ "$1" = "$2" ] && return 1 || verlte $1 $2
+  }
+
   counter() {
     for i in {0..10}; do
       echo -ne "$i"'\r';

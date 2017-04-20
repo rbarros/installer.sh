@@ -18,6 +18,9 @@ bash <(wget https://raw.githubusercontent.com/rbarros/installer.sh/master/instal
 
 ## Release History
 
+* **v1.1.0** - 2017-04-20
+   - Update scripts
+
 * **v1.0.0** - 2016-12-22
    - Initial release.
 
