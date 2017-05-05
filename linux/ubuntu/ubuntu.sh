@@ -10,6 +10,7 @@
     update_plataform
     check_gcc
     check_grep
+    check_sed
     menu
   }
 
@@ -44,7 +45,7 @@
 
   menu() {
     step "Select option install"
-    p="ok"
+    key="ok"
     # check_git_installation
     # check_git_config
     # check_composer_installation
@@ -53,35 +54,37 @@
     # alter_env
     # path_permissions
     # config
-    while true $p != "ok"
+    while true $key != "ok"
     do
        step_done
        debug "Menu"
        debug ""
        debug "1 - Install LAMP"
-       debug "2 - Oracle Instant"
-       debug "3 - Install Oci8"
-       debug "4 - Install PDO Oci8"
-       debug "5 - Install git"
-       debug "6 - Install composer"
-       debug "7 - Create Project"
-       debug "8 - Permissions"
-       debug "9 - Alter .env"
-       debug "10 - Sair"
+       debug "2 - Security Server"
+       debug "3 - Oracle Instant"
+       debug "4 - Install Oci8"
+       debug "5 - Install PDO Oci8"
+       debug "6 - Install git"
+       debug "7 - Install composer"
+       debug "8 - Create Project"
+       debug "9 - Permissions"
+       debug "10 - Alter .env"
+       debug "ESC - Sair"
        debug ""
        debug "Enter the desired option:"
-       read p
-       case $p in
-       10) break;;
-       9) alter_env ;;
-       8) path_permissions ;;
-       7) create_project ;;
-       6) check_composer_installation ;;
-       5) check_git_installation ;;
-       4) install_pdo_oci8 ;;
-       3) install_oci8 ;;
-       2) oracle_instant ;;
-       1) install_lamp ;;
+       read -s -n1 key
+       case $key in
+        1) install_lamp ;;
+        2) security ;;
+        3) oracle_instant ;;
+        4) install_oci8 ;;
+        5) install_pdo_oci8 ;;
+        6) check_git_installation ;;
+        7) check_composer_installation ;;
+        8) create_project ;;
+        9) path_permissions ;;
+        10) alter_env ;;
+        $'\e') break ;;
        esac
     done
     success
@@ -122,6 +125,60 @@
   install_httpd() {
     step "Install webserver ubuntu"
     super -v+ $PACKAGE $PACKAGE_INSTALL apache2
+    step_done
+    security
+  }
+
+  restart_httpd() {
+    step "Restart webserver..."
+    if command_exists apache2; then
+      super service apache2 restart
+    elif command_exists nginx; then
+      super service nginx restart
+    fi
+    step_done
+  }
+
+  security() {
+    step "Security webserver ubuntu"
+    if [ -f "/etc/apache2/conf-available/security.conf" ]; then
+      debug "Backup security.conf"
+      super cp /etc/apache2/conf-available/security.conf /etc/apache2/conf-available/security.conf.bkp
+      super sed -i -e "s/\(^ServerTokens \).*/\1Prod/" \
+                   -e "s/\(^ServerSignature \).*/\1Off/" \
+                   -e "s/\(^TraceEnable \).*/\1Off/" /etc/apache2/conf-available/security.conf
+      restart_httpd
+    else
+      echo "WebServer not installed"
+    fi
+    if [ -f "/etc/ssh/sshd_config" ]; then
+      debug "Backup sshd_config"
+      super cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bkp
+      if [ $(cat /etc/ssh/sshd_config | grep Banner | wc -l) > 1 ]; then
+        if [ $(cat /etc/ssh/sshd_config | grep '^Banner' | wc -l) == 1 ]; then
+          super sed -i -e "s/\(^Banner \).*/\1no/" /etc/ssh/sshd_config
+        fi
+        if [ $(cat /etc/ssh/sshd_config | grep '^DebianBanner' | wc -l) == 0 ]; then
+          super bash -c 'echo -e "DebianBanner no" >> /etc/ssh/sshd_config'
+        elif [ $(cat /etc/ssh/sshd_config | grep '^DebianBanner' | wc -l) == 1 ]; then
+          super sed -i -e "s/\(^DebianBanner \).*/\1no/" /etc/ssh/sshd_config
+        fi
+      else
+        if [ $(cat /etc/ssh/sshd_config | grep '#Banner' | wc -l) == "1" ]; then
+            super bash -c 'echo -e "Banner no" >> /etc/ssh/sshd_config'
+            super bash -c 'echo -e "DebianBanner no" >> /etc/ssh/sshd_config'
+        fi
+      fi
+      restart_ssh
+    else
+      echo "OpenSSH not installed!"
+    fi
+    step_done
+  }
+
+  restart_ssh() {
+    step "Restart webserver..."
+    super service ssh restart
     step_done
   }
 
@@ -283,7 +340,7 @@
     step "Install php"
     step_done
     super -v+ $PACKAGE install php-pear build-essential php7.0-dev #build-dep
-    super service apache2 restart
+    restart_httpd
   }
 
   install_pdo_oci8() {
@@ -502,7 +559,7 @@
     step "Install mbstring"
     step_done
     super -v+ $PACKAGE install php7.0-mbstring
-    super service apache2 restart
+    restart_httpd
   }
 
   check_zip_extension() {
@@ -518,7 +575,7 @@
     step "Install zip"
     step_done
     super -v+ $PACKAGE install php7.0-zip
-    super service apache2 restart
+    restart_httpd
   }
 
   alter_composer() {
@@ -554,7 +611,6 @@
   alter_env() {
     step "Changing the .env file project"
     step_done
-    install_sed
     read -p "What is the project name [$PROJECT] ? " PROJECT
     if [ -z "$PROJECT" ]; then
       debug "The project name is required."

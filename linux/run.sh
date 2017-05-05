@@ -106,16 +106,19 @@
     fi
   }
 
-  install_sed() {
+  check_sed() {
     step "Verifying that sed is installed"
     step_done
     if command_exists sed; then
       debug "sed already installed"
-      #debug $(sed --version)
     else
-      debug "Installing sed"
-      super ${PACKAGE_YES} ${PACKAGE_INSTALL} sed
+      install_sed
     fi
+  }
+
+  install_sed() {
+    debug "Installing sed"
+    super ${PACKAGE_YES} ${PACKAGE_INSTALL} sed
   }
 
 } # This ensures the entire script is downloaded
