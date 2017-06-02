@@ -2,7 +2,7 @@
 
 { # This ensures the entire script is downloaded
 
-  VERSION="1.1.0"
+  VERSION="1.1.1"
   LOCAL_RAW=http://localhost/installer.sh
   REMOTE_RAW=https://raw.github.com/rbarros/installer.sh/master
   ROOT_UID=0
@@ -17,21 +17,35 @@
   HTTPD_ROOT=""
   SERVER=""
 
-  ##
-  # Run local
-  ##
-  if [ "${1}" = "--local" ]; then
-    URL=$LOCAL_RAW
-  else
-    URL=$REMOTE_RAW
-  fi
+  CLEAN=false
+  URL=$REMOTE_RAW
+  while getopts lc opt
+  do
+      case "$opt" in
+        ##
+        # Run local
+        ##
+        l) URL=$LOCAL_RAW;;
+        ##
+        ## Clean a scripts downloaded in temporary diretory
+        ##
+        c) CLEAN=true;;
+        \?)   # unknown flag
+            echo >&2 \
+      "usage: $0 [-l local] [-c clean]"
+      exit 1;;
+      esac
+  done
+  shift `expr $OPTIND - 1`
 
   ##
   # Main
   ##
   main() {
     welcome
-    clean
+    if [ "$CLEAN" = true ]; then
+      clean
+    fi
     download_utils
     check_plataform
   }
@@ -52,6 +66,9 @@
     #printf '%s\n' 'Please look over the ~/.installerrc file to select plugins and options.'
     printf '%s\n'
     printf '%s\n' 'p.s. Follow us at http://github.com/rbarros/installer.sh'
+    printf '%s\n' "usage: $0 [-l local] [-c clean]"
+    printf '%s\n' '-l local Run a local'
+    printf '%s\n' '-c clean Clean a scripts downloaded in temporary diretory'
     printf '%s\n' '------------------------------------------------------------------'
   }
 
@@ -106,7 +123,9 @@
   # Download a script utils
   ##
   download_utils() {
-    echo -e "|   Downloading installer-utils.sh to /tmp/installer-utils.sh\n|\n|   + $(curl_or_wget $URL/utils.sh /tmp/installer-utils.sh)"
+    if [ ! -f /tmp/installer-utils.sh ]; then
+      echo -e "|   Downloading installer-utils.sh to /tmp/installer-utils.sh\n|\n|   + $(curl_or_wget $URL/utils.sh /tmp/installer-utils.sh)"
+    fi
 
     if [ -f /tmp/installer-utils.sh ]; then
         . /tmp/installer-utils.sh
@@ -120,7 +139,9 @@
   # Download script the plataform
   ##
   download_run() {
-    download "$PLATFORM-run" "$PLATFORM/run"
+    if [ ! -f /tmp/installer-$PLATFORM-run.sh ]; then
+      download "$PLATFORM-run" "$PLATFORM/run"
+    fi
 
     if [ -f /tmp/installer-$PLATFORM-run.sh ]; then
         . /tmp/installer-$PLATFORM-run.sh

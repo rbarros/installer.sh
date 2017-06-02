@@ -51,7 +51,9 @@
     debug "Detected distribution: $DISTRO, $RELEASE"
 
     # Download script a distro
-    download "$DISTRO" "$PLATFORM/$DISTRO/$DISTRO"
+    if [ ! -f /tmp/installer-$DISTRO.sh ]; then
+      download "$DISTRO" "$PLATFORM/$DISTRO/$DISTRO"
+    fi
 
     if [ -f /tmp/installer-$DISTRO.sh ]; then
         . /tmp/installer-$DISTRO.sh
