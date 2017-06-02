@@ -100,7 +100,7 @@
     case "$UNAME" in
       *x86_64*) ARCH=x64 ;;
       *i*86*)   ARCH=x86 ;;
-      *armv6l*) ARCH=arm-pi ;;
+      *armv*) ARCH=arm-pi ;;
     esac
 
     if [ -z $PLATFORM ] || [ -z $ARCH ]; then
