@@ -191,7 +191,11 @@
       debug $(mysql --version)
     else
       install_mysql
-      super mysql_secure_installation
+      debug "After installation run mysql_secure_installation"
+      debug "If you have problems with access run sudo mysql -u root -p"
+      debug " "
+      debug "GRANT ALL ON *.* TO \"root\"@\"localhost\" IDENTIFIED BY \"password\";"
+      debug " "
     fi
   }
 
