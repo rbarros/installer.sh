@@ -2,7 +2,7 @@
 
 { # This ensures the entire script is downloaded
 
-  VERSION="1.1.1"
+  VERSION="1.2.0"
   LOCAL_RAW=http://localhost/installer.sh
   REMOTE_RAW=https://raw.github.com/rbarros/installer.sh/master
   ROOT_UID=0
@@ -46,7 +46,7 @@
     if [ "$CLEAN" = true ]; then
       clean
     fi
-    download_utils
+    download_helpers
     check_plataform
   }
 
@@ -120,18 +120,18 @@
   }
 
   ##
-  # Download a script utils
+  # Download a script helpers
   ##
-  download_utils() {
-    if [ ! -f /tmp/installer-utils.sh ]; then
-      echo -e "|   Downloading installer-utils.sh to /tmp/installer-utils.sh\n|\n|   + $(curl_or_wget $URL/utils.sh /tmp/installer-utils.sh)"
+  download_helpers() {
+    if [ ! -f /tmp/installer-helpers.sh ]; then
+      echo -e "|   Downloading installer-helpers.sh to /tmp/installer-helpers.sh\n|\n|   + $(curl_or_wget $URL/helpers.sh /tmp/installer-helpers.sh)"
     fi
 
-    if [ -f /tmp/installer-utils.sh ]; then
-        . /tmp/installer-utils.sh
+    if [ -f /tmp/installer-helpers.sh ]; then
+        . /tmp/installer-helpers.sh
     else
         # Show error
-        echo -e "|\n|   Error: The utils.sh could not be downloaded\n|"
+        echo -e "|\n|   Error: The helpers.sh could not be downloaded\n|"
     fi
   }
 
