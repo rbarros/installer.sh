@@ -312,6 +312,7 @@
     debug "Use 'instantclient,/path/to/instant/client/lib' if you're compiling with Oracle Instant Client [autodetect] :"
     debug "copy and paste instantclient,/usr/lib/oracle/11.2/client64/lib"
     debug "http://www.oracle.com/technetwork/articles/technote-php-instant-084410.html"
+    PHP_VERSION_SHORT=$(php -v | cut -d' ' -f 2 | head -n 1 | awk -F - '{ print $1 }' | awk -F . '{ print $1"."$2}')
     export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
     super ln -nsf /usr/lib/oracle/11.2/client64/ /usr/lib/oracle/11.2/client
     super ln -nsf /usr/include/oracle/11.2/client64/ /usr/include/oracle/11.2/client
@@ -331,10 +332,10 @@
       debug "Use 'pecl install oci8' to install for PHP 7"
       echo 'instantclient,/usr/lib/oracle/11.2/client64/lib' | super -v+ pecl install oci8
     fi
-    if [ -d "/etc/php/7.0/mods-available/" ]; then
-      super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php/7.0/mods-available/oci8.ini'
-      super ln -s /etc/php/7.0/mods-available/oci8.ini /etc/php/7.0/apache2/conf.d/20-oci8.ini
-      super ln -s /etc/php/7.0/mods-available/oci8.ini /etc/php/7.0/cli/conf.d/20-oci8.ini
+    if [ -d "/etc/php/$PHP_VERSION_SHORT/mods-available/" ]; then
+      super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php/$PHP_VERSION_SHORT/mods-available/oci8.ini'
+      super ln -s /etc/php/$PHP_VERSION_SHORT/mods-available/oci8.ini /etc/php/$PHP_VERSION_SHORT/apache2/conf.d/20-oci8.ini
+      super ln -s /etc/php/$PHP_VERSION_SHORT/mods-available/oci8.ini /etc/php/$PHP_VERSION_SHORT/cli/conf.d/20-oci8.ini
     else
       super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php.d/20-oci8.ini'
     fi
@@ -352,6 +353,7 @@
     step "Install pdo oci8"
     step_done
     PHP_VERSION=$(php -v | cut -d' ' -f 2 | head -n 1 | awk -F - '{ print $1 }')
+    PHP_VERSION_SHORT=$(php -v | cut -d' ' -f 2 | head -n 1 | awk -F - '{ print $1 }' | awk -F . '{ print $1"."$2}')
     export ORACLE_HOME=/usr/lib/oracle/11.2/client64/
 
     #checking for oci.h... configure: error: I'm too dumb to figure out where the include dir is in your instant client install
@@ -386,10 +388,10 @@
     make
     make test
     super make install
-    if [ -d "/etc/php/7.0/mods-available/" ]; then
-      super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php/7.0/mods-available/pdo_oci.ini'
-      super ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/apache2/conf.d/20-pdo_oci.ini
-      super ln -s /etc/php/7.0/mods-available/pdo_oci.ini /etc/php/7.0/cli/conf.d/20-pdo_oci.ini
+    if [ -d "/etc/php/$PHP_VERSION_SHORT/mods-available/" ]; then
+      super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php/$PHP_VERSION_SHORT/mods-available/pdo_oci.ini'
+      super ln -s /etc/php/$PHP_VERSION_SHORT/mods-available/pdo_oci.ini /etc/php/$PHP_VERSION_SHORT/apache2/conf.d/20-pdo_oci.ini
+      super ln -s /etc/php/$PHP_VERSION_SHORT/mods-available/pdo_oci.ini /etc/php/$PHP_VERSION_SHORT/cli/conf.d/20-pdo_oci.ini
     elif [ -d "/etc/php5/conf.d/" ]; then
       super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php5/conf.d/pdo_oci.ini'
       super ln -s /etc/php5/conf.d/pdo_oci.ini /etc/php5/apache2/conf.d/20-pdo_oci.ini
