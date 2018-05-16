@@ -333,7 +333,7 @@
       echo 'instantclient,/usr/lib/oracle/11.2/client64/lib' | super -v+ pecl install oci8
     fi
     if [ -d "/etc/php/$PHP_VERSION_SHORT/mods-available/" ]; then
-      super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php/$PHP_VERSION_SHORT/mods-available/oci8.ini'
+      super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php/'$PHP_VERSION_SHORT'/mods-available/oci8.ini'
       super ln -s /etc/php/$PHP_VERSION_SHORT/mods-available/oci8.ini /etc/php/$PHP_VERSION_SHORT/apache2/conf.d/20-oci8.ini
       super ln -s /etc/php/$PHP_VERSION_SHORT/mods-available/oci8.ini /etc/php/$PHP_VERSION_SHORT/cli/conf.d/20-oci8.ini
     else
@@ -389,7 +389,7 @@
     make test
     super make install
     if [ -d "/etc/php/$PHP_VERSION_SHORT/mods-available/" ]; then
-      super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php/$PHP_VERSION_SHORT/mods-available/pdo_oci.ini'
+      super bash -c 'echo -e "; Enable pdo_oci extension module\nextension=pdo_oci.so" > /etc/php/'$PHP_VERSION_SHORT'/mods-available/pdo_oci.ini'
       super ln -s /etc/php/$PHP_VERSION_SHORT/mods-available/pdo_oci.ini /etc/php/$PHP_VERSION_SHORT/apache2/conf.d/20-pdo_oci.ini
       super ln -s /etc/php/$PHP_VERSION_SHORT/mods-available/pdo_oci.ini /etc/php/$PHP_VERSION_SHORT/cli/conf.d/20-pdo_oci.ini
     elif [ -d "/etc/php5/conf.d/" ]; then
