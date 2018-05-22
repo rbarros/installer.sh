@@ -18,6 +18,12 @@ bash <(wget https://raw.githubusercontent.com/rbarros/installer.sh/master/instal
 
 ## Release History
 
+* **v1.2.1** - 2018-05-22
+   - Add ubuntu 18
+
+* **v1.2.0** - 2018-02-06
+   - Changed file name with helpers
+
 * **v1.1.0** - 2017-04-20
    - Update scripts
 
