@@ -242,6 +242,7 @@
       14*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
       16*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
       17*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
+      18*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
     esac
     step_done
 
@@ -279,6 +280,7 @@
       14*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
       16*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
       17*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
+      18*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
     esac
 
     if [ -f /tmp/installer-mysql.sh ]; then
