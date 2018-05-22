@@ -186,7 +186,7 @@
     step_done
     rhel_install_epel
     rhel_install_ius
-    super -v+ $PACKAGE install php70u mod_php70u php70u-common php70u-cli php70u-mysqlnd php70u-mcrypt php70u-pear php70u-devel php70u-json php70u-mbstring
+    super -v+ $PACKAGE install php70 mod_php70 php70-common php70-cli php70-mysqlnd php70-mcrypt php70-pear php70-devel php70-json php70-mbstring
     super bash -c 'echo -e "<IfModule mod_rewrite.c>\n\tLoadModule rewrite_module modules/mod_rewrite.so\n</IfModule>" >> /etc/httpd/conf.modules.d/10-php.conf'
     super systemctl restart httpd.service
   }
@@ -268,7 +268,7 @@
   install_pear() {
     step "Install php"
     step_done
-    super -v+ $PACKAGE install php70u-pear php70u-devel
+    super -v+ $PACKAGE install php70-pear php70-devel
     super systemctl restart httpd.service
   }
 
@@ -487,7 +487,7 @@
   install_mbstring() {
     step "Install mbstring"
     step_done
-    super -v+ $PACKAGE install php70u-mbstring
+    super -v+ $PACKAGE install php70-mbstring
     super systemctl restart httpd.service
   }
 
@@ -503,7 +503,7 @@
   install_zip() {
     step "Install zip"
     step_done
-    super -v+ $PACKAGE install php70u-zip
+    super -v+ $PACKAGE install php70-zip
     super systemctl restart httpd.service
   }
 
