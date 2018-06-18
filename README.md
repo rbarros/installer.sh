@@ -18,6 +18,18 @@ bash <(wget https://raw.githubusercontent.com/rbarros/installer.sh/master/instal
 
 ## Release History
 
+* **v1.2.11** - 2018-06-18
+   - Update php-12.sh
+   - Update php-14.sh
+   - Update php-16.sh
+   - Update php-17.sh
+   - Update php-18.sh
+   - Update mysql-12.sh
+   - Update mysql-14.sh
+   - Update mysql-16.sh
+   - Update mysql-17.sh
+   - Update mysql-18.sh
+
 * **v1.2.1** - 2018-05-22
    - Add ubuntu 18
 
