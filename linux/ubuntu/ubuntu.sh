@@ -66,9 +66,10 @@
        debug "5 - Install PDO Oci8"
        debug "6 - Install git"
        debug "7 - Install composer"
-       debug "8 - Create Project"
-       debug "9 - Permissions"
-       debug "10 - Alter .env"
+       debug "8 - Install yarn"
+       debug "9 - Create Project"
+       debug "10 - Permissions"
+       debug "11 - Alter .env"
        debug "ESC - Sair"
        debug ""
        debug "Enter the desired option:"
@@ -81,9 +82,10 @@
         5) install_pdo_oci8 ;;
         6) check_git_installation ;;
         7) check_composer_installation ;;
-        8) create_project ;;
-        9) path_permissions ;;
-        10) alter_env ;;
+        8) check_yarn_installation ;;
+        9) create_project ;;
+        10) path_permissions ;;
+        11) alter_env ;;
         $'\e') break ;;
        esac
     done
@@ -494,6 +496,35 @@
         super mv composer.phar /usr/bin/composer
         super chmod +x /usr/bin/composer
     fi
+  }
+
+  check_yarn_installation() {
+    step "Checking Yarn installation"
+    step_done
+
+    if command_exists yarn; then
+      debug "Yarn is installed, skipping Yarn installation."
+      debug "  To update Yarn, run the command bellow:"
+      #debug "  $ yarn self-update" https://github.com/yarnpkg/yarn/issues/1139
+      debug " apt-get install yarn"
+      update_yarn
+    else
+      install_yarn
+    fi
+  }
+
+  update_yarn() {
+    step "Update Yarn"
+    step_done
+    super -v+ ${PACKAGE} -y install yarn
+  }
+
+  install_yarn() {
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | super -v+ apt-key add -
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | super -v+ tee /etc/apt/sources.list.d/yarn.list
+    step "Install Yarn"
+    step_done
+    super -v+ ${PACKAGE} -y install yarn
   }
 
   create_project() {

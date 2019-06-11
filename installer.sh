@@ -2,7 +2,7 @@
 
 { # This ensures the entire script is downloaded
 
-  VERSION="1.2.0"
+  VERSION="1.3.0"
   LOCAL_RAW=http://localhost/installer.sh
   REMOTE_RAW=https://raw.github.com/rbarros/installer.sh/master
   ROOT_UID=0
@@ -18,6 +18,7 @@
   SERVER=""
 
   CLEAN=false
+  LOCAL=false
   URL=$REMOTE_RAW
   while getopts lc opt
   do
@@ -25,7 +26,7 @@
         ##
         # Run local
         ##
-        l) URL=$LOCAL_RAW;;
+        l) LOCAL=true;;
         ##
         ## Clean a scripts downloaded in temporary diretory
         ##
@@ -43,6 +44,9 @@
   ##
   main() {
     welcome
+    if [ "$LOCAL" = true ]; then
+      URL=$LOCAL_RAW
+    fi
     if [ "$CLEAN" = true ]; then
       clean
     fi

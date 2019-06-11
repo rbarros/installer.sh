@@ -18,6 +18,9 @@ bash <(wget https://raw.githubusercontent.com/rbarros/installer.sh/master/instal
 
 ## Release History
 
+* **v1.3.0** - 2019-06-10
+   - Add yarn install
+
 * **v1.2.11** - 2018-06-18
    - Update php-12.sh
    - Update php-14.sh
