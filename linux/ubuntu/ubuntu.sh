@@ -204,6 +204,15 @@
 
   install_php() {
     step "Install php"
+    debug "20.04  focal      bullseye/ sid"
+    debug "19.10  eoan       buster  / sid"
+    debug "19.04  disco      buster  / sid"
+    debug "18.10  cosmic     buster  / sid"
+    debug "18.04  bionic     buster  / sid"
+    debug "17.10  artful     stretch / sid"
+    debug "17.04  zesty      stretch / sid"
+    debug "16.10  yakkety    stretch / sid"
+    debug "16.04  xenial     stretch / sid"
     debug "15.10  wily       jessie / sid"
     debug "15.04  vivid      jessie / sid"
     debug "14.10  utopic     jessie / sid"
@@ -242,9 +251,12 @@
     case ${RELEASE} in
       12*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
       14*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
+      15*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
       16*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
       17*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
       18*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
+      19*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
+      20*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
     esac
     step_done
 
@@ -280,9 +292,12 @@
     case ${RELEASE} in
       12*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
       14*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
+      15*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
       16*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
       17*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
       18*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
+      19*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
+      20*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
     esac
 
     if [ -f /tmp/installer-mysql.sh ]; then

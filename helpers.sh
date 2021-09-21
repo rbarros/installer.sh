@@ -41,18 +41,10 @@
 
   curl_or_wget() {
     CURL_BIN="curl"; WGET_BIN="wget"
-    if [ "$TOKEN" ]; then
-      if command_exists ${CURL_BIN}; then
-        $CURL_BIN -SL -H "Authorization: token ${TOKEN}" "$1" > "$2"
-      elif command_exists ${WGET_BIN}; then
-        $WGET_BIN -v -O- -t 2 -T 10 --header="Authorization: token ${TOKEN}" "$1" > "$2"
-      fi
-    else
-      if command_exists ${CURL_BIN}; then
-        $CURL_BIN -SL "$1" > "$2"
-      elif command_exists ${WGET_BIN}; then
-        $WGET_BIN -v -O- -t 2 -T 10 "$1" > "$2"
-      fi
+    if command_exists ${CURL_BIN}; then
+      $CURL_BIN -SL "$1" > "$2"
+    elif command_exists ${WGET_BIN}; then
+      $WGET_BIN -v -O- -t 2 -T 10 "$1" > "$2"
     fi
   }
 

@@ -25,10 +25,6 @@
   do
       case "$opt" in
         ##
-        ## Token private repo
-        ##
-        t) TOKEN="${OPTARG}";;
-        ##
         # Run local
         ##
         l) LOCAL=true;;
@@ -38,7 +34,7 @@
         c) CLEAN=true;;
         \?)   # unknown flag
             echo >&2 \
-      "usage: $0 [-l local] [-c clean] [-t token=""]"
+      "usage: $0 [-l local] [-c clean]"
       exit 1;;
       esac
   done
@@ -54,9 +50,6 @@
     fi
     if [ "$CLEAN" = true ]; then
       clean
-    fi
-    if [ -z "$TOKEN" ]; then
-      token
     fi
     download_helpers
     check_plataform
@@ -176,18 +169,10 @@
 
   curl_or_wget() {
     CURL_BIN="curl"; WGET_BIN="wget"
-    if [ "$TOKEN" ]; then
-      if command_exists ${CURL_BIN}; then
-        $CURL_BIN -SL -H "Authorization: token ${TOKEN}" "$1" > "$2"
-      elif command_exists ${WGET_BIN}; then
-        $WGET_BIN -v -O- -t 2 -T 10 --header="Authorization: token ${TOKEN}" "$1" > "$2"
-      fi
-    else
-      if command_exists ${CURL_BIN}; then
-        $CURL_BIN -SL "$1" > "$2"
-      elif command_exists ${WGET_BIN}; then
-        $WGET_BIN -v -O- -t 2 -T 10 "$1" > "$2"
-      fi
+    if command_exists ${CURL_BIN}; then
+      $CURL_BIN -SL "$1" > "$2"
+    elif command_exists ${WGET_BIN}; then
+      $WGET_BIN -v -O- -t 2 -T 10 "$1" > "$2"
     fi
   }
 
