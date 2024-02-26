@@ -6,6 +6,8 @@
     echo -e "|   Downloading installer-$1.sh to /tmp/installer-$1.sh\n|\n|   + $(curl_or_wget $URL/$2.sh /tmp/installer-$1.sh)"
   }
 
+  version() { echo "$@" | gawk -F. '{ printf("%03d%03d%03d\n", $1,$2,$3); }'; }
+
   version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
 
   verlte() {

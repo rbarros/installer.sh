@@ -312,8 +312,27 @@
   oracle_instant() {
     step "Install oracle instant"
     step_done
-    curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb" "/tmp/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb"
-    curl_or_wget "https://s3-sa-east-1.amazonaws.com/ramon-barros/downloads/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb" "/tmp/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb"
+    BASIC="/tmp/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm"
+    DEVEL="/tmp/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm"
+    read -p "Inform the location of the file [$BASIC] ? " BASIC
+    if [ -z "$BASIC" ]; then
+      debug "The project basic rpm is required."
+      oracle_instant
+    fi
+    read -p "Inform the location of the file [$DEVEL] ? " DEVEL
+    if [ -z "$DEVEL" ]; then
+      debug "The project devel rpm is required."
+      oracle_instant
+    fi
+    if command_exists alian; then
+      debug "alian is installed, skipping alien installation."
+    else
+      install_alien
+    fi
+    super -v+ mv $BASIC /tmp/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+    super -v+ mv $DEVEL /tmp/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
+    super -v+ alien /tmp/oracle-instantclient11.2-basic-11.2.0.4.0-1.x86_64.rpm
+    super -v+ alien /tmp/oracle-instantclient11.2-devel-11.2.0.4.0-1.x86_64.rpm
     super -v+ dpkg -i /tmp/oracle-instantclient11.2-basic_11.2.0.4.0-2_amd64.deb
     super -v+ dpkg -i /tmp/oracle-instantclient11.2-devel_11.2.0.4.0-2_amd64.deb
     super mkdir /usr/lib/oracle/11.2/client64/network/admin -p
@@ -322,10 +341,17 @@
     super setsebool -P httpd_can_network_connect on
   }
 
+  install_alien() {
+    step "Install alien"
+    step_done
+    super -v+ $PACKAGE install alien
+  }
+
   install_oci8() {
     step "Install oci8"
     step_done
-    debug "Use 'pecl install oci8' to install for PHP 7."
+    debug "Use 'pecl install oci8' to install for PHP 8."
+    debug "Use 'pecl install oci8-2.2.0' to install for PHP 7."
     debug "Use 'pecl install oci8-2.0.12' to install for PHP 5.2 - PHP 5.6."
     debug "Use 'pecl install oci8-1.4.10' to install for PHP 4.3.9 - PHP 5.1."
     debug "Use 'instantclient,/path/to/instant/client/lib' if you're compiling with Oracle Instant Client [autodetect] :"
@@ -342,15 +368,19 @@
       install_pear
     fi
     recommended_version=7.0.0
-    current_version=$(php -v)
-    if version_gt "7.0.0" $current_version; then
-      warn "current php version is smaller recomended!"
-      debug "Use 'pecl install oci8-2.0.12' to install for PHP 5.2 - PHP 5.6"
-      echo 'instantclient,/usr/lib/oracle/11.2/client64/lib' | super -v+ pecl install oci8-2.0.12
-    else
-      debug "Use 'pecl install oci8' to install for PHP 7"
-      echo 'instantclient,/usr/lib/oracle/11.2/client64/lib' | super -v+ pecl install oci8
-    fi
+    debug "Recommended Version: $recommended_version"
+    debug "Current Version: $PHP_VERSION_SHORT"
+    #if [  "$(version "5")"-le "$($PHP_VERSION_SHORT "$")" ]; then
+    #  warn "current php version is smaller recomended!"
+    #  debug "Use 'pecl install oci8-2.0.12' to install for PHP 5.2 - PHP 5.6"
+    #  echo 'instantclient,/usr/lib/oracle/11.2/client64/lib' | super -v+ pecl install oci8-2.0.12
+    #elif [ "$(version "7")" -le "$($PHP_VERSION_SHORT "$")" ]; then
+      debug "Use 'pecl install oci8-2.2.0' to install for PHP 7"
+      echo 'instantclient,/usr/lib/oracle/11.2/client64/lib' | super -v+ pecl install oci8-2.2.0
+    #elif [ "$(version "8")" -le "$($PHP_VERSION_SHORT "$")" ]; then
+    #  debug "Use 'pecl install oci8' to install for PHP 8"
+    #  echo 'instantclient,/usr/lib/oracle/11.2/client64/lib' | super -v+ pecl install oci8
+    #fi
     if [ -d "/etc/php/$PHP_VERSION_SHORT/mods-available/" ]; then
       super bash -c 'echo -e "; Enable oci8 extension module\nextension=oci8.so" > /etc/php/'$PHP_VERSION_SHORT'/mods-available/oci8.ini'
       super ln -s /etc/php/$PHP_VERSION_SHORT/mods-available/oci8.ini /etc/php/$PHP_VERSION_SHORT/apache2/conf.d/20-oci8.ini
