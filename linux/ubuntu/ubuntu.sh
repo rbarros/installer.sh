@@ -204,27 +204,14 @@
 
   install_php() {
     step "Install php"
-    debug "20.04  focal      bullseye/ sid"
-    debug "19.10  eoan       buster  / sid"
-    debug "19.04  disco      buster  / sid"
-    debug "18.10  cosmic     buster  / sid"
-    debug "18.04  bionic     buster  / sid"
-    debug "17.10  artful     stretch / sid"
-    debug "17.04  zesty      stretch / sid"
-    debug "16.10  yakkety    stretch / sid"
-    debug "16.04  xenial     stretch / sid"
-    debug "15.10  wily       jessie / sid"
-    debug "15.04  vivid      jessie / sid"
-    debug "14.10  utopic     jessie / sid"
-    debug "14.04  trusty     jessie / sid"
-    debug "13.10  saucy      wheezy / sid"
-    debug "13.04  raring     wheezy / sid"
-    debug "12.10  quantal    wheezy / sid"
-    debug "12.04  precise    wheezy / sid"
-    debug "11.10  oneiric    wheezy / sid"
-    debug "11.04  natty      squeeze / sid"
-    debug "10.10  maverick   squeeze / sid"
-    debug "10.04  lucid      squeeze / sid"
+    debug "24.04  noble      bookworm"
+    debug "22.04  jammy      bullseye"
+    debug "20.04  focal      buster"
+    debug "18.04  bionic     stretch"
+    debug "16.04  xenial     jessie"
+    debug "14.04  trusty     wheezy"
+    debug "12.04  precise    squeeze"
+    debug "10.04  lucid      lenny"
     debug ""
     debug "This PPA contains latest PHP 5.5 packaged for Ubuntu 14.04 LTS (Trusty)."
     debug ""
@@ -257,6 +244,8 @@
       18*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
       19*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
       20*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
+      22*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
+      24*) download "php" "$PLATFORM/$DISTRO/app/php-$V";;
     esac
     step_done
 
@@ -298,6 +287,8 @@
       18*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
       19*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
       20*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
+      22*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
+      24*) download "mysql" "$PLATFORM/$DISTRO/app/mysql-$V";;
     esac
 
     if [ -f /tmp/installer-mysql.sh ]; then
@@ -350,7 +341,9 @@
   install_oci8() {
     step "Install oci8"
     step_done
-    debug "Use 'pecl install oci8' to install for PHP 8."
+    debug "Use 'pecl install oci8' to install for PHP 8.2 and PHP 8.3."
+    debug "Use 'pecl install oci8-3.2.1' to install for PHP 8.1."
+    debug "Use 'pecl install oci8-3.0.1' to install for PHP 8.0."
     debug "Use 'pecl install oci8-2.2.0' to install for PHP 7."
     debug "Use 'pecl install oci8-2.0.12' to install for PHP 5.2 - PHP 5.6."
     debug "Use 'pecl install oci8-1.4.10' to install for PHP 4.3.9 - PHP 5.1."
